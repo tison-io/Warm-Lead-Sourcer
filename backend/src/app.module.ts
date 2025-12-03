@@ -9,7 +9,7 @@ import { UserModule } from './users/user.module';
 
 @Module({
   imports: [
-    // Global configuration module for environment variables
+   
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -17,12 +17,12 @@ import { UserModule } from './users/user.module';
   
     ThrottlerModule.forRoot([
       {
-        ttl: 60000,   // 60 seconds
-        limit: 20,    // 20 requests per minute per IP
+        ttl: Number(process.env.THROTTLE_TTL) || 60000,   
+        limit: Number(process.env.THROTTLE_LIMIT) || 20,    
       },
     ]),
 
-    // MongoDB connection with async configuration
+  
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
@@ -48,7 +48,7 @@ import { UserModule } from './users/user.module';
   controllers: [AppController],
   providers: [
     AppService,
-    // Apply throttling globally
+ 
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
