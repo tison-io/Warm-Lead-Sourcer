@@ -5,7 +5,10 @@ import { Lead } from './schemas/lead.schema';
 
 describe('LeadsService', () => {
   let service: LeadsService;
-  let mockLeadModel: any;
+  let mockLeadModel: {
+    find: jest.Mock;
+    updateMany: jest.Mock;
+  };
 
   beforeEach(async () => {
     mockLeadModel = {

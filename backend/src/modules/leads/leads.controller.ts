@@ -1,11 +1,18 @@
-import { 
-  Controller, 
-  Get, 
-  Param, 
-  Query, 
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
   UseGuards,
-  Request 
+  Request,
 } from '@nestjs/common';
+
+interface AuthenticatedRequest {
+  user: {
+    userId: string;
+    email: string;
+  };
+}
 import { LeadsService } from './leads.service';
 import { LeadFilterDto } from './dto/lead-filter.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -19,7 +26,7 @@ export class LeadsController {
   async getLeadsByPost(
     @Param('postId') postId: string,
     @Query() filters: LeadFilterDto,
-    @Request() req
+    @Request() req: AuthenticatedRequest,
   ) {
     return this.leadsService.findByPost(postId, req.user.userId, filters);
   }
@@ -27,7 +34,7 @@ export class LeadsController {
   @Get('post/:postId/stats')
   async getPostStats(
     @Param('postId') postId: string,
-    @Request() req
+    @Request() req: AuthenticatedRequest,
   ) {
     return this.leadsService.getStats(postId, req.user.userId);
   }

@@ -4,7 +4,11 @@ import { Model } from 'mongoose';
 import { Post, PostDocument } from '../posts/schemas/post.schema';
 import { Lead, LeadDocument } from '../leads/schemas/lead.schema';
 import { LinkedInProvider } from './providers/linkedin.provider';
-import { Platform, EngagementData, ProfileData } from '../../common/interfaces/scraping.interface';
+import {
+  Platform,
+  EngagementData,
+  ProfileData,
+} from '../../common/interfaces/scraping.interface';
 
 @Injectable()
 export class ScrapingService {
@@ -24,10 +28,14 @@ export class ScrapingService {
 
     try {
       await this.postModel.findByIdAndUpdate(postId, { status: 'processing' });
-      
+
       // Extract post data and engagements
-      const postData = await this.getProvider(post.platform as Platform).extractPostData(post.url);
-      const engagements = await this.getProvider(post.platform as Platform).extractEngagements(postData.id);
+      const postData = await this.getProvider(
+        post.platform as Platform,
+      ).extractPostData(post.url);
+      const engagements = await this.getProvider(
+        post.platform as Platform,
+      ).extractEngagements(postData.id);
 
       // Update post with extracted data
       await this.postModel.findByIdAndUpdate(postId, {
@@ -44,7 +52,10 @@ export class ScrapingService {
           await this.processEngagement(postId, post.userId, engagement);
           processedCount++;
         } catch (error) {
-          this.logger.warn(`Failed to process engagement for ${engagement.user.name}:`, error.message);
+          this.logger.warn(
+            `Failed to process engagement for ${engagement.user.name}:`,
+            error.message,
+          );
         }
       }
 
@@ -55,8 +66,9 @@ export class ScrapingService {
         processedAt: new Date(),
       });
 
-      this.logger.log(`Successfully processed post ${postId}: ${processedCount}/${engagements.length} leads created`);
-
+      this.logger.log(
+        `Successfully processed post ${postId}: ${processedCount}/${engagements.length} leads created`,
+      );
     } catch (error) {
       this.logger.error(`Failed to process post ${postId}:`, error.message);
       await this.postModel.findByIdAndUpdate(postId, {
@@ -67,7 +79,11 @@ export class ScrapingService {
     }
   }
 
-  private async processEngagement(postId: string, userId: string, engagement: EngagementData): Promise<void> {
+  private async processEngagement(
+    postId: string,
+    userId: string,
+    engagement: EngagementData,
+  ): Promise<void> {
     // Check if lead already exists
     const existingLead = await this.leadModel.findOne({
       postId,
@@ -82,7 +98,9 @@ export class ScrapingService {
     // Extract full profile data
     let profileData: ProfileData;
     try {
-      profileData = await this.getProvider(Platform.LINKEDIN).extractProfile(engagement.user.urn);
+      profileData = await this.getProvider(Platform.LINKEDIN).extractProfile(
+        engagement.user.urn,
+      );
       // Use name and headline from engagement data since profile endpoints don't provide them
       profileData.name = engagement.user.name;
       profileData.headline = engagement.user.headline || '';
@@ -135,13 +153,13 @@ export class ScrapingService {
 
   private calculateMatchScore(profile: ProfileData): number {
     let score = 10; // Base score for having engagement
-    
+
     // Scoring logic based on available data
     if (profile.headline) score += 15;
     if (profile.education && profile.education.length > 0) {
       score += 30;
       // Bonus for degree information
-      if (profile.education.some(edu => edu.degree)) {
+      if (profile.education.some((edu) => edu.degree)) {
         score += 10;
       }
     }
@@ -159,7 +177,7 @@ export class ScrapingService {
 
     const firstName = profile.name.split(' ')[0]?.toLowerCase();
     const lastName = profile.name.split(' ').slice(-1)[0]?.toLowerCase();
-    
+
     if (!firstName || !lastName) return undefined;
 
     // Try to find university domain
@@ -179,7 +197,7 @@ export class ScrapingService {
     const domains: Record<string, string> = {
       'stanford university': 'stanford.edu',
       'harvard university': 'harvard.edu',
-      'mit': 'mit.edu',
+      mit: 'mit.edu',
       'university of california': 'berkeley.edu',
       'carnegie mellon': 'cmu.edu',
       'georgia tech': 'gatech.edu',

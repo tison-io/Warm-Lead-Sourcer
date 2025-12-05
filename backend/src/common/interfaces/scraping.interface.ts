@@ -66,14 +66,14 @@ export interface ExperienceData {
 export enum Platform {
   LINKEDIN = 'linkedin',
   INSTAGRAM = 'instagram',
-  TWITTER = 'twitter'
+  TWITTER = 'twitter',
 }
 
 export enum EngagementType {
   LIKE = 'like',
   COMMENT = 'comment',
   SHARE = 'share',
-  REACTION = 'reaction'
+  REACTION = 'reaction',
 }
 
 export interface LeadData extends ProfileData {

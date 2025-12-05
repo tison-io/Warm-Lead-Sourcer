@@ -28,8 +28,9 @@ export class PostsService {
     const savedPost = await post.save();
 
     // Trigger scraping asynchronously
-    this.scrapingService.processPost(savedPost._id.toString())
-      .catch(error => console.error('Scraping failed:', error));
+    this.scrapingService
+      .processPost(savedPost._id.toString())
+      .catch((error) => console.error('Scraping failed:', error));
 
     return savedPost;
   }
@@ -47,33 +48,37 @@ export class PostsService {
   }
 
   async updateStatus(
-    id: string, 
-    status: string, 
-    errorMessage?: string
+    id: string,
+    status: string,
+    errorMessage?: string,
   ): Promise<Post | null> {
-    const updateData: any = { status };
-    
+    const updateData: Record<string, any> = { status };
+
     if (status === 'completed') {
       updateData.processedAt = new Date();
     }
-    
+
     if (errorMessage) {
       updateData.errorMessage = errorMessage;
     }
 
-    return this.postModel.findByIdAndUpdate(id, updateData, { new: true }).exec();
+    return this.postModel
+      .findByIdAndUpdate(id, updateData, { new: true })
+      .exec();
   }
 
   async updateMetrics(
-    id: string, 
-    totalEngagements: number, 
-    processedEngagements: number
+    id: string,
+    totalEngagements: number,
+    processedEngagements: number,
   ): Promise<Post | null> {
-    return this.postModel.findByIdAndUpdate(
-      id,
-      { totalEngagements, processedEngagements },
-      { new: true }
-    ).exec();
+    return this.postModel
+      .findByIdAndUpdate(
+        id,
+        { totalEngagements, processedEngagements },
+        { new: true },
+      )
+      .exec();
   }
 
   private detectPlatform(url: string): Platform {
@@ -86,29 +91,30 @@ export class PostsService {
     if (url.includes('twitter.com') || url.includes('x.com')) {
       return Platform.TWITTER;
     }
-    
+
     throw new Error('Unsupported platform');
   }
 
   private extractPostId(url: string, platform: Platform): string {
     switch (platform) {
-      case Platform.LINKEDIN:
+      case Platform.LINKEDIN: {
         const patterns = [
           /activity-(\d+)/,
           /posts\/([^?]+)/,
-          /urn:li:activity:(\d+)/
+          /urn:li:activity:(\d+)/,
         ];
-        
+
         for (const pattern of patterns) {
           const match = url.match(pattern);
           if (match) return match[1];
         }
         break;
-        
+      }
+
       default:
         throw new Error(`Post ID extraction not implemented for ${platform}`);
     }
-    
+
     throw new Error('Could not extract post ID from URL');
   }
 }

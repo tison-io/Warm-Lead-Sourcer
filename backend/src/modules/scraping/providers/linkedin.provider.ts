@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosResponse } from 'axios';
-import { 
-  ScrapingProvider, 
-  PostData, 
-  EngagementData, 
-  ProfileData, 
+import {
+  ScrapingProvider,
+  PostData,
+  EngagementData,
+  ProfileData,
   Platform,
-  EngagementType 
+  EngagementType,
 } from '../../../common/interfaces/scraping.interface';
 
 @Injectable()
@@ -31,15 +31,15 @@ export class LinkedInProvider implements ScrapingProvider {
 
   async extractPostData(url: string): Promise<PostData> {
     const postUrn = this.extractUrnFromUrl(url);
-    
+
     try {
       const response = await axios.get(
         `https://${this.rapidApiHost}/api/v1/posts/info?urn=${postUrn}`,
-        { headers: this.getHeaders() }
+        { headers: this.getHeaders() },
       );
 
       const data = response.data.data.post;
-      
+
       return {
         id: postUrn,
         url,
@@ -70,10 +70,13 @@ export class LinkedInProvider implements ScrapingProvider {
       // Get comments
       const commentsResponse = await axios.get(
         `https://${this.rapidApiHost}/api/v1/posts/comments?urn=${postId}`,
-        { headers: this.getHeaders() }
+        { headers: this.getHeaders() },
       );
 
-      if (commentsResponse.data.success && commentsResponse.data.data.comments) {
+      if (
+        commentsResponse.data.success &&
+        commentsResponse.data.data.comments
+      ) {
         commentsResponse.data.data.comments.forEach((comment: any) => {
           engagements.push({
             type: EngagementType.COMMENT,
@@ -91,7 +94,7 @@ export class LinkedInProvider implements ScrapingProvider {
       try {
         const likesResponse = await axios.get(
           `https://${this.rapidApiHost}/api/v1/posts/likes?urn=${postId}`,
-          { headers: this.getHeaders() }
+          { headers: this.getHeaders() },
         );
 
         if (likesResponse.data.success && likesResponse.data.data) {
@@ -114,7 +117,7 @@ export class LinkedInProvider implements ScrapingProvider {
       // Get education data
       const educationResponse = await axios.get(
         `https://${this.rapidApiHost}/api/v1/profile/education?urn=${profileUrn}`,
-        { headers: this.getHeaders() }
+        { headers: this.getHeaders() },
       );
 
       // Get skills data
@@ -122,7 +125,7 @@ export class LinkedInProvider implements ScrapingProvider {
       try {
         const skillsResponse = await axios.get(
           `https://${this.rapidApiHost}/api/v1/profile/skills?urn=${profileUrn}`,
-          { headers: this.getHeaders() }
+          { headers: this.getHeaders() },
         );
         skillsData = skillsResponse.data.data?.skills || [];
       } catch (error) {
@@ -130,7 +133,7 @@ export class LinkedInProvider implements ScrapingProvider {
       }
 
       const education = educationResponse.data.data?.education || [];
-      
+
       // Map education data to our format
       const mappedEducation = education.map((edu: any) => ({
         institution: edu.university || '',
@@ -163,7 +166,7 @@ export class LinkedInProvider implements ScrapingProvider {
     const patterns = [
       /activity-(\d+)/,
       /posts\/([^?]+)/,
-      /urn:li:activity:(\d+)/
+      /urn:li:activity:(\d+)/,
     ];
 
     for (const pattern of patterns) {

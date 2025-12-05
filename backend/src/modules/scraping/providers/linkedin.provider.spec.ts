@@ -61,7 +61,7 @@ describe('LinkedInProvider', () => {
       mockedAxios.get.mockResolvedValue(mockResponse);
 
       const result = await provider.extractPostData(
-        'https://www.linkedin.com/feed/update/urn:li:activity:7353638537595932672'
+        'https://www.linkedin.com/feed/update/urn:li:activity:7353638537595932672',
       );
 
       expect(result).toEqual({
@@ -84,9 +84,9 @@ describe('LinkedInProvider', () => {
     });
 
     it('should handle invalid URL', async () => {
-      await expect(
-        provider.extractPostData('invalid-url')
-      ).rejects.toThrow('Could not extract URN from LinkedIn URL');
+      await expect(provider.extractPostData('invalid-url')).rejects.toThrow(
+        'Could not extract URN from LinkedIn URL',
+      );
     });
   });
 
