@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { EngagementType } from '../../../common/interfaces/scraping.interface';
 
 export type LeadDocument = Lead & Document;
 
@@ -28,20 +27,22 @@ export class Lead {
     type: {
       country: String,
       city: String,
-    }
+    },
   })
   location?: {
     country: string;
     city: string;
   };
 
-  @Prop([{
-    institution: String,
-    degree: String,
-    fieldOfStudy: String,
-    startYear: Number,
-    endYear: Number,
-  }])
+  @Prop([
+    {
+      institution: String,
+      degree: String,
+      fieldOfStudy: String,
+      startYear: Number,
+      endYear: Number,
+    },
+  ])
   education: Array<{
     institution: string;
     degree?: string;
@@ -50,13 +51,15 @@ export class Lead {
     endYear?: number;
   }>;
 
-  @Prop([{
-    company: String,
-    title: String,
-    startDate: Date,
-    endDate: Date,
-    current: Boolean,
-  }])
+  @Prop([
+    {
+      company: String,
+      title: String,
+      startDate: Date,
+      endDate: Date,
+      current: Boolean,
+    },
+  ])
   experience: Array<{
     company: string;
     title: string;

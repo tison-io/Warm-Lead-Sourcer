@@ -6,12 +6,14 @@ import { LeadFilterDto } from './dto/lead-filter.dto';
 
 @Injectable()
 export class LeadsService {
-  constructor(
-    @InjectModel(Lead.name) private leadModel: Model<LeadDocument>,
-  ) {}
+  constructor(@InjectModel(Lead.name) private leadModel: Model<LeadDocument>) {}
 
-  async findByPost(postId: string, userId: string, filters?: LeadFilterDto): Promise<Lead[]> {
-    const query: any = { postId, userId };
+  async findByPost(
+    postId: string,
+    userId: string,
+    filters?: LeadFilterDto,
+  ): Promise<Lead[]> {
+    const query: Record<string, any> = { postId, userId };
 
     // Apply filters
     if (filters?.country) {
@@ -32,13 +34,16 @@ export class LeadsService {
     return this.leadModel.find(query).sort({ matchScore: -1 }).exec();
   }
 
-  async getStats(postId: string, userId: string): Promise<{
+  async getStats(
+    postId: string,
+    userId: string,
+  ): Promise<{
     total: number;
     byEngagementType: Record<string, number>;
     averageScore: number;
   }> {
     const leads = await this.leadModel.find({ postId, userId });
-    
+
     const stats = {
       total: leads.length,
       byEngagementType: {} as Record<string, number>,
@@ -48,13 +53,14 @@ export class LeadsService {
     if (leads.length === 0) return stats;
 
     // Count by engagement type
-    leads.forEach(lead => {
-      stats.byEngagementType[lead.engagementType] = 
+    leads.forEach((lead) => {
+      stats.byEngagementType[lead.engagementType] =
         (stats.byEngagementType[lead.engagementType] || 0) + 1;
     });
 
     // Calculate average score
-    stats.averageScore = leads.reduce((sum, lead) => sum + lead.matchScore, 0) / leads.length;
+    stats.averageScore =
+      leads.reduce((sum, lead) => sum + lead.matchScore, 0) / leads.length;
 
     return stats;
   }
@@ -62,7 +68,7 @@ export class LeadsService {
   async markAsExported(leadIds: string[]): Promise<void> {
     await this.leadModel.updateMany(
       { _id: { $in: leadIds } },
-      { exported: true }
+      { exported: true },
     );
   }
 }

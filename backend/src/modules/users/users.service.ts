@@ -25,7 +25,8 @@ export class UsersService {
   ) {}
 
   async register(registerUserDto: RegisterUserDto): Promise<User> {
-    const { firstName, lastName, email, password, confirmPassword } = registerUserDto;
+    const { firstName, lastName, email, password, confirmPassword } =
+      registerUserDto;
 
     if (password !== confirmPassword) {
       throw new BadRequestException('Passwords do not match');

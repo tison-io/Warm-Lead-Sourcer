@@ -25,10 +25,10 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
-  async googleAuthRedirect(
+  googleAuthRedirect(
     @Req() req: AuthenticatedRequest,
     @Res() res: Response,
-  ) {
+  ): void {
     try {
       this.logger.log('Google callback received');
 
@@ -38,10 +38,12 @@ export class AuthController {
       }
 
       this.logger.log(`Processing login for user: ${req.user.email}`);
-      
+
       // TODO: Inject UserService properly
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      res.redirect(`${frontendUrl}/auth/success?user=${encodeURIComponent(JSON.stringify(req.user))}`);
+      res.redirect(
+        `${frontendUrl}/auth/success?user=${encodeURIComponent(JSON.stringify(req.user))}`,
+      );
     } catch (error) {
       this.logger.error('Google OAuth error:', error);
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';

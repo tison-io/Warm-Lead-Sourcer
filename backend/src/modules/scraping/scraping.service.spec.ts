@@ -85,7 +85,9 @@ describe('ScrapingService', () => {
 
       mockPostModel.findById.mockResolvedValue(mockPost);
       mockLinkedInProvider.extractPostData.mockResolvedValue(mockPostData);
-      mockLinkedInProvider.extractEngagements.mockResolvedValue(mockEngagements);
+      mockLinkedInProvider.extractEngagements.mockResolvedValue(
+        mockEngagements,
+      );
       mockLinkedInProvider.extractProfile.mockResolvedValue({
         urn: 'user-urn',
         name: 'Test User',
@@ -95,10 +97,9 @@ describe('ScrapingService', () => {
 
       await service.processPost('post-id');
 
-      expect(mockPostModel.findByIdAndUpdate).toHaveBeenCalledWith(
-        'post-id',
-        { status: 'processing' }
-      );
+      expect(mockPostModel.findByIdAndUpdate).toHaveBeenCalledWith('post-id', {
+        status: 'processing',
+      });
       expect(mockLinkedInProvider.extractPostData).toHaveBeenCalled();
       expect(mockLinkedInProvider.extractEngagements).toHaveBeenCalled();
     });
@@ -106,7 +107,9 @@ describe('ScrapingService', () => {
     it('should handle post not found', async () => {
       mockPostModel.findById.mockResolvedValue(null);
 
-      await expect(service.processPost('invalid-id')).rejects.toThrow('Post not found');
+      await expect(service.processPost('invalid-id')).rejects.toThrow(
+        'Post not found',
+      );
     });
   });
 });
