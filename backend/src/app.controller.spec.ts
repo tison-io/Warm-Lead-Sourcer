@@ -15,8 +15,14 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return API message', () => {
+      expect(appController.getHello()).toBe('Warm Lead Sourcer API');
+    });
+
+    it('should return health status', () => {
+      const health = appController.getHealth();
+      expect(health).toHaveProperty('status', 'ok');
+      expect(health).toHaveProperty('service', 'warm-lead-sourcer-backend');
     });
   });
 });
