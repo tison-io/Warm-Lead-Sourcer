@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
 export default function LandingPage() {
@@ -94,9 +95,11 @@ export default function LandingPage() {
           <div className="flex flex-col md:flex-row items-center gap-12">
             {/* Left side - Image */}
             <div className="flex-1">
-              <img 
+              <Image 
                 src="/images/leftlanding.jpg" 
                 alt="How it works illustration" 
+                width={800}
+                height={600}
                 className="w-full h-auto rounded-lg shadow-lg"
               />
             </div>
