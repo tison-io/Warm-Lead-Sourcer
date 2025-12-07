@@ -78,7 +78,7 @@ export class AuthController {
 
       // Redirect to frontend dashboard
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      res.redirect(`${frontendUrl}/dash`);
+      res.redirect(`${frontendUrl}/input-url`);
     } catch (error) {
       this.logger.error('Google OAuth error:', error);
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
