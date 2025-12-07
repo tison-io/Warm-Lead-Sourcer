@@ -98,3 +98,40 @@ export async function logout(): Promise<void> {
     method: 'POST',
   });
 }
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
+}
+
+/**
+ * Request password reset code
+ */
+export async function forgotPassword(data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> {
+  return apiRequest<ForgotPasswordResponse>('/users/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Reset password with token
+ */
+export async function resetPassword(data: ResetPasswordRequest): Promise<ResetPasswordResponse> {
+  return apiRequest<ResetPasswordResponse>('/users/reset-password', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
