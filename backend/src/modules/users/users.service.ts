@@ -11,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { User, UserDocument } from './schemas/user.schema';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { EmailService } from '../email/email.service';
 
 export interface LoginResponse {
   access_token: string;
@@ -23,6 +24,7 @@ export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   async register(registerUserDto: RegisterUserDto): Promise<LoginResponse> {
@@ -52,7 +54,7 @@ export class UsersService {
 
     const savedUser = await newUser.save();
 
-    // Auto-login after registration
+   
     const payload = { sub: savedUser._id, email: savedUser.email };
     const access_token = await this.jwtService.signAsync(payload, { expiresIn: '15m' });
     const refresh_token = await this.jwtService.signAsync(payload, { expiresIn: '7d' });
@@ -191,8 +193,14 @@ export class UsersService {
       resetPasswordExpires: expiresAt,
     });
 
-    // TODO: Send email with resetToken (not hashedToken)
-    // Email service integration pending
+    // Send email with resetToken (not hashedToken)
+    try {
+      await this.emailService.sendPasswordResetCode(user.email, resetToken);
+    } catch (error) {
+      // Log error but don't reveal to user for security
+      console.error('Failed to send password reset email:', error);
+      // Still return success message to prevent email enumeration
+    }
 
     return { message: 'If the email exists, a reset link has been sent' };
   }
