@@ -58,7 +58,7 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
+     
       <section
         className="relative min-h-[600px] bg-cover bg-center"
         style={{ backgroundImage: "url(/images/landing_page.png)" }}
@@ -99,7 +99,7 @@ export default function LandingPage() {
                 src="/images/leftlanding.jpg" 
                 alt="How it works illustration" 
                 width={800}
-                height={600}
+                height={200}
                 className="w-full h-auto rounded-lg shadow-lg"
               />
             </div>
@@ -114,7 +114,8 @@ export default function LandingPage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-black mb-2">Post a public URL</h3>
+                  <h3 className="text-xl font-semibold text-black mb-6">Post a public URL</h3>
+                  <p className="text-sm text-gray-600 mb-10">🎯 Identify Warm Intent. Drop a link to instantly target users who have already shown interest in a topic relevant to your brand.</p>
                 </div>
               </div>
 
@@ -126,7 +127,8 @@ export default function LandingPage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-black mb-2">We extract reactions + do public-only enrichment</h3>
+                  <h3 className="text-xl font-semibold text-black mb-6">We extract reactions + do public-only enrichment</h3>
+                  <p className="text-sm text-gray-600 mb-10">✨ Validate & Enrich Leads. We automatically extract engaged users and enhance their profiles with only public data.</p>
                 </div>
               </div>
 
@@ -138,7 +140,8 @@ export default function LandingPage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-black mb-2">Download a clean CSV/XLSX lead list</h3>
+                  <h3 className="text-xl font-semibold text-black mb-6">Download a clean CSV/XLSX lead list</h3>
+                  <p className="text-sm text-gray-600 mb-10">📥 CRM-Ready Lead List. Export a clean, structured list in your preferred format (CSV/XLSX) with zero manual cleanup required.</p>
                 </div>
               </div>
             </div>
@@ -151,24 +154,57 @@ export default function LandingPage() {
         <div className="mx-auto max-w-7xl">
           <h2 className="mb-12 text-center text-4xl font-bold text-black">Use cases</h2>
           <div className="grid gap-12 md:grid-cols-3">
-            <div className="text-center">
-              <h3 className="mb-4 text-xl font-bold text-black">Recruiters</h3>
-              <p className="text-sm text-gray-700">Find talent from engagement</p>
+            <div className="flex flex-col items-center text-center">
+              <div className="flex items-center">  
+                <div className="mb-4  mr-4 w-20 h-20 rounded-full overflow-hidden">
+                <Image 
+                  src="/images/Recruiters.jpg" 
+                  alt="Recruiters" 
+                  width={80}
+                  height={80}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h3 className="mb-4 text-xl font-bold text-black">Recruiters</h3></div>
+            
+              <p className="text-sm text-gray-700">Identify passive candidates who have proven expertise and alignment before you even send the first message.</p>
             </div>
-            <div className="text-center">
+            <div className="flex flex-col items-center text-center">
+              <div className="flex items-center">  
+                <div className="mb-4  mr-4 w-20 h-20 rounded-full overflow-hidden">
+                <Image 
+                  src="/images/Founders.jpg" 
+                  alt="Founders" 
+                  width={80}
+                  height={80}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
               <h3 className="mb-4 text-xl font-bold text-black">Founders</h3>
+              </div>
               <p className="text-sm text-gray-700">
-                See who interacted with your
-                <br />
-                thought-leadership posts.
+                Identify early adopters, key advocates, and potential investors who are already bought into your vision and product story.
+               
               </p>
             </div>
-            <div className="text-center">
-              <h3 className="mb-4 text-xl font-bold text-black">Growth/BD</h3>
+            <div className="flex flex-col items-center text-center">
+              <div className="flex items-center">
+              
+              <div className="mb-4 mr-4 w-20 h-20 rounded-full overflow-hidden">
+                <Image 
+                  src="/images/Growth.jpg" 
+                  alt="Growth" 
+                  width={80}
+                  height={80}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h3 className="mb-4 text-xl font-bold text-black">Growth</h3></div>
+              
               <p className="text-sm text-gray-700">
-                Prioritize people already warmed
-                <br />
-                up
+              Focus your sales efforts exclusively on pre-qualified leads with a higher probability of conversion and a shorter sales cycle.
+               
               </p>
             </div>
           </div>

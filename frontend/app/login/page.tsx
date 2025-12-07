@@ -38,8 +38,8 @@ function LoginForm() {
 
     try {
       await login({ email, password })
-      // Redirect to home page on success
-      router.push("/dash")
+     
+      router.push("/input-url")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed. Please try again.")
     } finally {
@@ -79,7 +79,7 @@ function LoginForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@gmail.com"
                 required
-                className="w-full rounded-md border-0 bg-purple-100 px-4 py-3 text-sm text-black placeholder:text-gray-100"
+                className="w-full rounded-md border-0 bg-purple-100 px-4 py-3 text-sm text-black placeholder:text-gray-500"
               />
             </div>
 
