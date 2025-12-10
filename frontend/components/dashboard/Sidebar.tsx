@@ -3,10 +3,12 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useSidebar } from "@/contexts/SidebarContext"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function Sidebar() {
   const pathname = usePathname()
   const { isOpen, setIsOpen } = useSidebar()
+  const { user, logout } = useAuth()
 
   return (
     <>
@@ -26,7 +28,9 @@ export default function Sidebar() {
             <circle cx="50" cy="75" r="30" fill="#8B5CF6"/>
           </svg>
         </div>
-            <p className="font-semibold text-black">Joyce Monroe</p>
+            <p className="font-semibold text-black">
+              {user ? `${user.firstName} ${user.lastName}` : 'Loading...'}
+            </p>
           </div>
           <button
             onClick={() => setIsOpen(!isOpen)}
@@ -94,7 +98,14 @@ export default function Sidebar() {
         </Link>
       </nav>
 
-      <button className={`flex items-center ${isOpen ? 'gap-3 px-4' : 'justify-center px-2'} py-2 mt-8 text-gray-700 hover:text-black transition-colors`} title="Log Out">
+      <button 
+        onClick={async () => {
+          await logout()
+          window.location.href = '/login'
+        }}
+        className={`flex items-center ${isOpen ? 'gap-3 px-4' : 'justify-center px-2'} py-2 mt-8 text-gray-700 hover:text-black transition-colors`} 
+        title="Log Out"
+      >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
           <path d="M16 17L21 12L16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

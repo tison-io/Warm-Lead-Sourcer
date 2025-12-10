@@ -6,6 +6,7 @@ import Sidebar from "@/components/dashboard/Sidebar"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import { dashboardApi } from "@/lib/api"
 import { useSidebar } from "@/contexts/SidebarContext"
+import { useAuth } from "@/contexts/AuthContext"
 
 interface DashboardStats {
   totalScrapes: number;
@@ -28,6 +29,7 @@ export default function Dashboard() {
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const { isOpen } = useSidebar();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -71,7 +73,9 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Dashboard</h1>
-                <p className="text-sm lg:text-base text-gray-600">Welcome back, Joyce Monroe</p>
+                <p className="text-sm lg:text-base text-gray-600">
+                  Welcome, {user ? `${user.firstName} ${user.lastName}` : 'Guest'}
+                </p>
               </div>
             <Link 
               href="/input-url"
