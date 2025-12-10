@@ -40,6 +40,12 @@ export class User {
 
   @Prop({ required: false })
   emailVerificationExpires?: Date;
+
+  @Prop({ required: false })
+  expiresAt?: Date;
+
+  @Prop({ required: false })
+  deletedAt?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

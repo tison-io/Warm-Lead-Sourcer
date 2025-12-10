@@ -63,6 +63,12 @@ export class Post {
 
   @Prop({ default: 0 })
   processedEngagements: number;
+
+  @Prop({ required: false })
+  expiresAt?: Date;
+
+  @Prop({ required: false })
+  deletedAt?: Date;
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -11,12 +12,15 @@ import { PostsModule } from './modules/posts/posts.module';
 import { ScrapingModule } from './modules/scraping/scraping.module';
 import { LeadsModule } from './modules/leads/leads.module';
 import { ExportModule } from './modules/export/export.module';
+import { CleanupModule } from './modules/cleanup/cleanup.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+
+    ScheduleModule.forRoot(),
 
     ThrottlerModule.forRoot([
       {
@@ -51,6 +55,7 @@ import { ExportModule } from './modules/export/export.module';
     ScrapingModule,
     LeadsModule,
     ExportModule,
+    CleanupModule,
   ],
   controllers: [AppController],
   providers: [

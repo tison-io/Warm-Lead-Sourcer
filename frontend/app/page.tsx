@@ -45,15 +45,69 @@ export default function LandingPage() {
     return () => clearInterval(interval);
   }, [useCaseCards.length]);
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
-      <Navbar />
+    <div className="min-h-screen bg-white">
+      {/* Navigation */}
+      <nav className="border-b bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-2">
+            <svg width="76" height="47" viewBox="0 0 76 47" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-12 w-auto">
+              <path d="M1.52227 47.0001L0 43.9556L18.2673 34.0608L32.3483 40.3402L69.0732 19.2186L66.9801 15.2227L75.9235 17.1255L73.2595 26.0689L70.4052 22.2632L32.5386 44.1459L18.2673 37.8665L1.52227 47.0001Z" fill="black"/>
+              <path d="M23.0242 31.9678L18.2673 29.6846L1.71265 39.1982V31.207C1.71265 31.207 1.87057 29.7403 2.09351 28.9229C2.20501 28.5142 2.39499 28.0385 2.55737 27.665L2.85425 27.0205C3.91989 25.0224 5.50083 22.4683 8.40796 21.1152C6.2077 19.6828 4.75761 17.2384 4.75757 14.4619C4.75757 10.0481 8.42037 6.46982 12.9392 6.46973C17.4581 6.46973 21.1218 10.0481 21.1218 14.4619C21.1218 17.2027 19.7082 19.6199 17.5554 21.0596C20.3412 22.296 21.8423 24.6567 23.0242 27.0205V31.9678Z" fill="#B785FF"/>
+              <path d="M44.3359 28.9233L32.1582 35.9634L23.0244 31.9683V27.02C23.0281 26.9958 23.185 25.969 23.4053 25.3081C23.6282 24.6393 24.166 23.5952 24.166 23.5952C25.218 21.6227 26.7718 19.1076 29.6084 17.7417C27.6895 16.2472 26.4493 13.8859 26.4492 11.2271C26.4492 6.70814 30.0276 3.04444 34.4414 3.04443C38.8552 3.04443 42.4336 6.70813 42.4336 11.2271C42.4335 13.9171 41.1646 16.3031 39.207 17.7944C41.7766 19.0672 43.2031 21.3295 44.3359 23.5952V28.9233Z" fill="#B785FF"/>
+              <path d="M58.0365 21.1221L44.3363 28.9229V23.7861C44.3363 23.7861 44.9577 21.7026 45.4779 20.5508C45.9981 19.399 47.0004 17.8867 47.0004 17.8867C47.7934 16.7914 48.9295 15.4216 50.8949 14.5537C48.7718 13.11 47.3813 10.7105 47.3812 7.99219C47.3812 3.57844 51.0441 0.000124469 55.5629 0C60.0818 0 63.7455 3.57836 63.7455 7.99219C63.7454 10.7463 62.3184 13.1743 60.1478 14.6113C61.8744 15.4161 62.9067 16.651 63.7455 17.8867L58.0365 21.1221Z" fill="#B785FF"/>
+            </svg>
+            <div>
+              <div className="text-lg font-bold leading-tight text-black">Warm leads</div>
+              <div className="text-lg font-bold leading-tight text-black">Sourcer</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-8">
+            <Link href="/" className="text-sm text-gray-700 hover:text-black">
+              Home
+            </Link>
+            <Link href="#how-it-works" className="text-sm text-gray-700 hover:text-black">
+             How it works
+            </Link>
+            <Link href="#use-cases" className="text-sm text-gray-700 hover:text-black">
+              Use Cases
+            </Link>
+            <Link href="#compliance" className="text-sm text-gray-700 hover:text-black">
+            Legal
+            </Link>
+             <Link href="/privacy-policy" className="text-sm text-gray-700 hover:text-black">
+            Privacy
+            </Link>
+            <Link href="/signup">
+              <Button 
+                variant="outline"
+                className="rounded-[15px] border-2 bg-white px-8 py-2 text-black hover:bg-gray-200"
+                style={{ 
+                  borderImage: 'linear-gradient(to right, #6E5099, #AD7EF1) 1'
+                }}
+              >
+                Sign Up
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button 
+                className="rounded-[15px] px-8 py-2 text-white hover:opacity-90"
+                style={{ 
+                  background: 'linear-gradient(to right, #6E5099, #AD7EF1)'
+                }}
+              >
+                Login
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </nav>
 
      
       <section
         className="relative h-[calc(100vh-4rem)] bg-cover bg-center overflow-hidden"
         style={{ backgroundImage: "url(/images/landing_page.png)" }}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80 dark:from-black/85 dark:via-black/80 dark:to-black/90" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/70 via-black/60 to-black/80 dark:from-black/85 dark:via-black/80 dark:to-black/90" />
         
         {/* Animated gradient orbs */}
         <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/30 rounded-full blur-3xl animate-pulse" />
@@ -65,7 +119,7 @@ export default function LandingPage() {
               <span className="block text-white drop-shadow-lg">
                 Turn Social Engagement Into
               </span>
-              <span className="inline-block mt-2 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500 bg-clip-text text-transparent animate-pulse">
+              <span className="inline-block mt-2 bg-linear-to-r from-purple-400 via-pink-400 to-purple-500 bg-clip-text text-transparent animate-pulse">
                 Warm Leads
               </span>
               <span className="text-white drop-shadow-lg"> Instantly</span>
@@ -89,7 +143,7 @@ export default function LandingPage() {
                   </div>
                   <Button 
                     onClick={() => router.push('/input-url')}
-                    className="group relative rounded-full bg-gradient-to-r from-purple-500 to-purple-700 px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white hover:from-purple-600 hover:to-purple-800 shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105 whitespace-nowrap w-full sm:w-auto"
+                    className="group relative rounded-full bg-linear-to-r from-purple-500 to-purple-700 px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-white hover:from-purple-600 hover:to-purple-800 shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105 whitespace-nowrap w-full sm:w-auto"
                   >
                     <span className="flex items-center gap-2 justify-center">
                       Extract
@@ -101,7 +155,7 @@ export default function LandingPage() {
                 </div>
               ) : (
                 <Link href="/signup" className="w-full sm:w-auto max-w-xs">
-                  <Button className="group relative rounded-full bg-gradient-to-r from-purple-500 to-purple-700 px-6 sm:px-8 py-3 text-sm sm:text-base font-semibold text-white hover:from-purple-600 hover:to-purple-800 shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105 w-full">
+                  <Button className="group relative rounded-full bg-linear-to-r from-purple-500 to-purple-700 px-6 sm:px-8 py-3 text-sm sm:text-base font-semibold text-white hover:from-purple-600 hover:to-purple-800 shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105 w-full">
                     <span className="flex items-center gap-2 justify-center">
                       Start Free
                       <svg className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -117,7 +171,7 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="relative bg-gradient-to-b from-white to-purple-50/30 dark:from-gray-900 dark:to-gray-800 px-4 sm:px-6 py-12 sm:py-16 lg:py-20 transition-colors overflow-hidden">
+      <section id="how-it-works" className="relative bg-linear-to-b from-white to-purple-50/30 dark:from-gray-900 dark:to-gray-800 px-4 sm:px-6 py-12 sm:py-16 lg:py-20 transition-colors overflow-hidden">
         {/* Background decoration */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-purple-200/20 dark:bg-purple-900/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-pink-200/20 dark:bg-pink-900/10 rounded-full blur-3xl" />
@@ -125,7 +179,7 @@ export default function LandingPage() {
         <div className="relative mx-auto max-w-7xl">
           <div className="text-center mb-8 sm:mb-10 lg:mb-12">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-2 sm:mb-3">
-              How It <span className="bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">Works</span>
+              How It <span className="bg-linear-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">Works</span>
             </h2>
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto px-4">Transform social engagement into qualified leads in three simple steps</p>
           </div>
@@ -134,7 +188,7 @@ export default function LandingPage() {
             {/* Left - Image */}
             <div className="order-2 lg:order-1">
               <div className="relative group max-w-md lg:max-w-lg mx-auto">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity" />
+                <div className="absolute inset-0 bg-linear-to-r from-purple-500 to-pink-500 rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity" />
                 <Image 
                   src="/images/leftlanding.jpg" 
                   alt="How it works illustration" 
@@ -151,7 +205,7 @@ export default function LandingPage() {
               <div className="group relative bg-white dark:bg-gray-800/90 backdrop-blur-sm rounded-xl sm:rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-purple-100 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-500 hover:-translate-x-2">
                 <div className="flex items-start gap-4">
                   <div className="shrink-0">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg group-hover:scale-110 transition-transform">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-linear-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg group-hover:scale-110 transition-transform">
                       1
                     </div>
                   </div>
@@ -171,7 +225,7 @@ export default function LandingPage() {
               <div className="group relative bg-white dark:bg-gray-800/90 backdrop-blur-sm rounded-xl sm:rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-purple-100 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-500 hover:-translate-x-2">
                 <div className="flex items-start gap-4">
                   <div className="shrink-0">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg group-hover:scale-110 transition-transform">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-linear-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg group-hover:scale-110 transition-transform">
                       2
                     </div>
                   </div>
@@ -191,7 +245,7 @@ export default function LandingPage() {
               <div className="group relative bg-white dark:bg-gray-800/90 backdrop-blur-sm rounded-xl sm:rounded-2xl p-5 sm:p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-purple-100 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-500 hover:-translate-x-2">
                 <div className="flex items-start gap-4">
                   <div className="shrink-0">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg group-hover:scale-110 transition-transform">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-linear-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg group-hover:scale-110 transition-transform">
                       3
                     </div>
                   </div>
@@ -219,7 +273,7 @@ export default function LandingPage() {
         <div className="relative mx-auto max-w-7xl">
           <div className="text-center mb-8 sm:mb-10">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-2 sm:mb-3">
-              Use <span className="bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">Cases</span>
+              Use <span className="bg-linear-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">Cases</span>
             </h2>
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400">Perfect for every growth-focused professional</p>
           </div>
@@ -235,7 +289,7 @@ export default function LandingPage() {
                 return (
                   <div
                     key={card.id}
-                    className="group transition-all duration-1000 cursor-pointer transform flex-shrink-0 perspective-1000"
+                    className="group transition-all duration-1000 cursor-pointer transform shrink-0 perspective-1000"
                     style={{
                       transform: `translateX(${translateX * 0.9}px) ${isActive ? 'translateY(-8px)' : 'translateY(0px)'}`,
                       opacity: isActive ? 1 : 0.4,
@@ -246,7 +300,7 @@ export default function LandingPage() {
                   >
                     <div className={`relative w-56 sm:w-64 h-72 sm:h-80 rounded-2xl shadow-2xl overflow-hidden transition-all duration-700 ${isActive ? 'ring-4 ring-purple-400 dark:ring-purple-500' : ''} hover:shadow-purple-500/50`}>
                       {/* Background gradient overlay */}
-                      <div className={`absolute inset-0 ${card.bgColor.includes('purple') ? 'bg-gradient-to-br from-purple-400/90 to-purple-600/90 dark:from-purple-600/95 dark:to-purple-800/95' : card.bgColor.includes('pink') ? 'bg-gradient-to-br from-pink-400/90 to-pink-600/90 dark:from-pink-600/95 dark:to-pink-800/95' : 'bg-gradient-to-br from-blue-400/90 to-blue-600/90 dark:from-blue-600/95 dark:to-blue-800/95'}`} />
+                      <div className={`absolute inset-0 ${card.bgColor.includes('purple') ? 'bg-linear-to-br from-purple-400/90 to-purple-600/90 dark:from-purple-600/95 dark:to-purple-800/95' : card.bgColor.includes('pink') ? 'bg-linear-to-br from-pink-400/90 to-pink-600/90 dark:from-pink-600/95 dark:to-pink-800/95' : 'bg-linear-to-br from-blue-400/90 to-blue-600/90 dark:from-blue-600/95 dark:to-blue-800/95'}`} />
                       
                       {/* Content */}
                       <div className="relative z-10 h-full flex flex-col items-center justify-center p-5 text-center">
@@ -292,7 +346,7 @@ export default function LandingPage() {
                 onClick={() => setActiveCardIndex(index)}
                 className={`transition-all duration-300 rounded-full cursor-pointer ${
                   index === activeCardIndex
-                    ? "w-8 h-3 bg-gradient-to-r from-purple-600 to-purple-800 shadow-lg"
+                    ? "w-8 h-3 bg-linear-to-r from-purple-600 to-purple-800 shadow-lg"
                     : "w-3 h-3 bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 dark:hover:bg-slate-500"
                 }`}
                 aria-label={`Go to ${useCaseCards[index].title}`}
@@ -303,14 +357,14 @@ export default function LandingPage() {
       </section>
 
       {/* Compliance Section */}
-      <section id="compliance" className="relative bg-gradient-to-b from-purple-50/30 to-white dark:from-gray-800 dark:to-gray-900 px-4 sm:px-6 py-12 sm:py-16 lg:py-20 transition-colors overflow-hidden">
+      <section id="compliance" className="relative bg-linear-to-b from-purple-50/30 to-white dark:from-gray-800 dark:to-gray-900 px-4 sm:px-6 py-12 sm:py-16 lg:py-20 transition-colors overflow-hidden">
         <div className="absolute top-0 left-0 w-96 h-96 bg-purple-200/20 dark:bg-purple-900/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-pink-200/20 dark:bg-pink-900/10 rounded-full blur-3xl" />
         
         <div className="relative mx-auto max-w-6xl">
           <div className="text-center mb-8 sm:mb-12">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-2 sm:mb-3">
-              Compliance & <span className="bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">Privacy</span>
+              Compliance & <span className="bg-linear-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">Privacy</span>
             </h2>
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400">Your data security is our priority</p>
           </div>
@@ -365,16 +419,16 @@ export default function LandingPage() {
             </div>
 
             {/* Vertical Divider - Hidden on mobile */}
-            <div className="hidden lg:block absolute left-1/2 top-24 bottom-24 w-px bg-gradient-to-b from-transparent via-purple-300 dark:via-purple-700 to-transparent" />
+            <div className="hidden lg:block absolute left-1/2 top-24 bottom-24 w-px bg-linear-to-b from-transparent via-purple-300 dark:via-purple-700 to-transparent" />
 
             {/* Right Side - Summary */}
             <div className="flex items-center justify-center lg:justify-start">
               <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity" />
+                <div className="absolute inset-0 bg-linear-to-r from-purple-500 to-pink-500 rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity" />
                 <div className="relative bg-white dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-purple-100 dark:border-gray-700">
                   <div className="flex items-start gap-4 mb-4">
                     <div className="shrink-0">
-                      <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center shadow-lg">
+                      <div className="w-12 h-12 bg-linear-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center shadow-lg">
                         <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
@@ -382,7 +436,7 @@ export default function LandingPage() {
                     </div>
                     <div>
                       <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Ethical Sourcing</h3>
-                      <div className="w-16 h-1 bg-gradient-to-r from-purple-600 to-purple-800 rounded-full" />
+                      <div className="w-16 h-1 bg-linear-to-r from-purple-600 to-purple-800 rounded-full" />
                     </div>
                   </div>
                   <p className="text-base text-slate-600 dark:text-gray-300 leading-relaxed">
@@ -396,7 +450,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-b from-purple-100 to-purple-50 dark:from-gray-900 dark:to-slate-950 px-4 sm:px-6 py-12 sm:py-16 border-t border-purple-200 dark:border-gray-800 transition-colors">
+      <footer className="bg-linear-to-b from-purple-100 to-purple-50 dark:from-gray-900 dark:to-slate-950 px-4 sm:px-6 py-12 sm:py-16 border-t border-purple-200 dark:border-gray-800 transition-colors">
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-8">
             {/* Company Info */}
@@ -409,8 +463,8 @@ export default function LandingPage() {
                   <path d="M58.0365 21.1221L44.3363 28.9229V23.7861C44.3363 23.7861 44.9577 21.7026 45.4779 20.5508C45.9981 19.399 47.0004 17.8867 47.0004 17.8867C47.7934 16.7914 48.9295 15.4216 50.8949 14.5537C48.7718 13.11 47.3813 10.7105 47.3812 7.99219C47.3812 3.57844 51.0441 0.000124469 55.5629 0C60.0818 0 63.7455 3.57836 63.7455 7.99219C63.7454 10.7463 62.3184 13.1743 60.1478 14.6113C61.8744 15.4161 62.9067 16.651 63.7455 17.8867L58.0365 21.1221Z" fill="#4B0082"/>
                 </svg>
                 <div>
-                  <div className="text-sm font-bold leading-tight bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">Warm leads</div>
-                  <div className="text-sm font-bold leading-tight bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">Sourcer</div>
+                  <div className="text-sm font-bold leading-tight bg-linear-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">Warm leads</div>
+                  <div className="text-sm font-bold leading-tight bg-linear-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">Sourcer</div>
                 </div>
               </Link>
               <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
