@@ -17,6 +17,7 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 interface AuthenticatedRequest extends ExpressRequest {
@@ -48,13 +49,13 @@ export class UsersController {
 
   @Post('register')
   @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 requests per minute
-  async register(
-    @Body() registerUserDto: RegisterUserDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    const result = await this.usersService.register(registerUserDto);
-    this.setCookies(res, result.access_token, result.refresh_token);
-    return { user: result.user };
+  async register(@Body() registerUserDto: RegisterUserDto) {
+    await this.usersService.register(registerUserDto);
+    return {
+      message:
+        'Registration successful. Please check your email to verify your account.',
+      email: registerUserDto.email,
+    };
   }
 
   @Post('login')
@@ -127,5 +128,20 @@ export class UsersController {
     const userObj = user.toObject();
     const { password: _, refreshToken: __, ...userWithoutPassword } = userObj;
     return { user: userWithoutPassword };
+  }
+
+  @Post('verify-email')
+  @HttpCode(200)
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  async verifyEmail(
+    @Body() verifyEmailDto: VerifyEmailDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.usersService.verifyEmail(
+      verifyEmailDto.email,
+      verifyEmailDto.code,
+    );
+    this.setCookies(res, result.access_token, result.refresh_token);
+    return { user: result.user, message: 'Email verified successfully' };
   }
 }

@@ -76,9 +76,9 @@ export class AuthController {
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       });
 
-      // Redirect to frontend dashboard
+      // Redirect to frontend (cookies already set)
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      res.redirect(`${frontendUrl}/input-url`);
+      res.redirect(`${frontendUrl}/auth/success`);
     } catch (error) {
       this.logger.error('Google OAuth error:', error);
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';

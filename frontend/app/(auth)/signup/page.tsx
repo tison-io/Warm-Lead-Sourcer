@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import { register } from "@/lib/api"
 
 export default function SignupPage() {
   const router = useRouter()
@@ -33,15 +32,18 @@ export default function SignupPage() {
     setIsLoading(true)
 
     try {
-      await register({
-        firstName,
-        lastName,
-        email,
-        password,
-        confirmPassword,
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName, lastName, email, password, confirmPassword }),
       })
-      // Redirect to home page on success
-      router.push("/login")
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.message || 'Registration failed')
+      }
+
+      router.push(`/verify-email?email=${encodeURIComponent(email)}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed. Please try again.")
     } finally {

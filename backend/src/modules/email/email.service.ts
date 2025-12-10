@@ -1,116 +1,136 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as nodemailer from 'nodemailer';
-import type { SentMessageInfo } from 'nodemailer';
+import * as SibApiV3Sdk from 'sib-api-v3-sdk';
 
+/**
+ * Email service using Brevo (formerly Sendinblue) for transactional emails
+ * Handles email verification and password reset emails
+ */
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
-  private transporter: nodemailer.Transporter;
+  private apiInstance: any;
 
   constructor(private configService: ConfigService) {
-    this.initializeTransporter();
+    this.initializeBrevo();
   }
 
-  private initializeTransporter() {
-    const emailHost =
-      this.configService.get<string>('SMTP_HOST') || 'smtp.gmail.com';
-    const emailPort = this.configService.get<number>('SMTP_PORT') || 587;
-    const emailUser = this.configService.get<string>('SMTP_USER');
-    const emailPassword = this.configService.get<string>('SMTP_PASSWORD');
+  /**
+   * Initialize Brevo API client with API key from environment
+   */
+  private initializeBrevo() {
+    const apiKey = this.configService.get<string>('BREVO_API_KEY');
 
-    if (!emailUser || !emailPassword) {
+    if (!apiKey) {
       this.logger.warn(
-        'Email credentials not configured. Email functionality will be disabled. ' +
-          'Please set EMAIL_USER, EMAIL_PASSWORD, and optionally EMAIL_FROM in your .env file.',
+        'Brevo API key not configured. Email functionality will be disabled.',
       );
       return;
     }
 
-    this.transporter = nodemailer.createTransport({
-      host: emailHost,
-      port: emailPort,
-      secure: emailPort === 465, // true for 465, false for other ports
-      auth: {
-        user: emailUser,
-        pass: emailPassword,
-      },
-    });
+    const defaultClient = SibApiV3Sdk.ApiClient.instance;
+    const apiKeyAuth = defaultClient.authentications['api-key'];
+    apiKeyAuth.apiKey = apiKey;
+    this.apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
-    this.transporter.verify((error) => {
-      if (error) {
-        this.logger.error('Email transporter verification failed:', error);
-      } else {
-        this.logger.log('Email transporter configured successfully');
-      }
-    });
+    this.logger.log('Brevo email service initialized successfully');
   }
 
-  async sendPasswordResetCode(email: string, code: string): Promise<void> {
-    if (!this.transporter) {
+  /**
+   * Send email verification code to user
+   * @param email - User's email address
+   * @param code - 6-digit verification code
+   */
+  async sendEmailVerification(email: string, code: string): Promise<void> {
+    if (!this.apiInstance) {
+      this.logger.error('Brevo API not initialized.');
+      throw new Error('Email service is not configured.');
+    }
+
+    const fromEmail = this.configService.get<string>('BREVO_FROM_EMAIL');
+    const fromName =
+      this.configService.get<string>('BREVO_FROM_NAME') || 'Warm Lead Sourcer';
+
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sendSmtpEmail.sender = { name: fromName, email: fromEmail };
+    sendSmtpEmail.to = [{ email }];
+    sendSmtpEmail.subject = 'Verify Your Email';
+    sendSmtpEmail.htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background-color: #f8f9fa; padding: 30px; border-radius: 8px;">
+            <h2 style="color: #7c3aed;">Welcome to ${fromName}!</h2>
+            <p>Please verify your email address with this code:</p>
+            <div style="background-color: #fff; border: 2px solid #7c3aed; border-radius: 6px; padding: 20px; text-align: center; margin: 20px 0;">
+              <h1 style="color: #7c3aed; font-size: 32px; letter-spacing: 8px; margin: 0;">${code}</h1>
+            </div>
+            <p style="color: #666; font-size: 14px;">This code will expire in 1 hour.</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    try {
+      await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+      this.logger.log(`Verification email sent to ${email}`);
+    } catch (error) {
       this.logger.error(
-        'Email transporter not initialized. Cannot send password reset code.',
+        `Failed to send verification email to ${email}:`,
+        error.response?.body || error.message || error,
+      );
+      throw new Error('Failed to send verification email.');
+    }
+  }
+
+  /**
+   * Send password reset code to user
+   * @param email - User's email address
+   * @param code - 6-digit reset code
+   */
+  async sendPasswordResetCode(email: string, code: string): Promise<void> {
+    if (!this.apiInstance) {
+      this.logger.error(
+        'Brevo API not initialized. Cannot send password reset code.',
       );
       throw new Error(
         'Email service is not configured. Please contact support.',
       );
     }
 
-    const emailFrom =
-      this.configService.get<string>('EMAIL_FROM') ||
-      this.configService.get<string>('EMAIL_USER');
-    const appName = this.configService.get<string>('APP_NAME') || 'WarmLead';
+    const fromEmail = this.configService.get<string>('BREVO_FROM_EMAIL');
+    const fromName =
+      this.configService.get<string>('BREVO_FROM_NAME') || 'Warm Lead Sourcer';
 
-    const mailOptions = {
-      from: `"${appName}" <${emailFrom}>`,
-      to: email,
-      subject: 'Password Reset Code',
-      html: `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          </head>
-          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background-color: #f8f9fa; padding: 30px; border-radius: 8px;">
-              <h2 style="color: #7c3aed; margin-top: 0;">Password Reset Request</h2>
-              <p>You have requested to reset your password for your ${appName} account.</p>
-              <p>Your password reset code is:</p>
-              <div style="background-color: #ffffff; border: 2px solid #7c3aed; border-radius: 6px; padding: 20px; text-align: center; margin: 20px 0;">
-                <h1 style="color: #7c3aed; font-size: 32px; letter-spacing: 8px; margin: 0; font-family: 'Courier New', monospace;">${code}</h1>
-              </div>
-              <p style="color: #666; font-size: 14px;">This code will expire in 1 hour.</p>
-              <p style="color: #666; font-size: 14px;">If you didn't request this password reset, please ignore this email.</p>
-              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-              <p style="color: #999; font-size: 12px; text-align: center;">This is an automated message, please do not reply.</p>
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sendSmtpEmail.sender = { name: fromName, email: fromEmail };
+    sendSmtpEmail.to = [{ email }];
+    sendSmtpEmail.subject = 'Password Reset Code';
+    sendSmtpEmail.htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background-color: #f8f9fa; padding: 30px; border-radius: 8px;">
+            <h2 style="color: #7c3aed;">Password Reset Request</h2>
+            <p>You have requested to reset your password for your ${fromName} account.</p>
+            <p>Your password reset code is:</p>
+            <div style="background-color: #fff; border: 2px solid #7c3aed; border-radius: 6px; padding: 20px; text-align: center; margin: 20px 0;">
+              <h1 style="color: #7c3aed; font-size: 32px; letter-spacing: 8px; margin: 0;">${code}</h1>
             </div>
-          </body>
-        </html>
-      `,
-      text: `
-        Password Reset Request
-        
-        You have requested to reset your password for your ${appName} account.
-        
-        Your password reset code is: ${code}
-        
-        This code will expire in 1 hour.
-        
-        If you didn't request this password reset, please ignore this email.
-      `,
-    };
+            <p style="color: #666; font-size: 14px;">This code will expire in 1 hour.</p>
+            <p style="color: #666; font-size: 14px;">If you didn't request this password reset, please ignore this email.</p>
+          </div>
+        </body>
+      </html>
+    `;
 
     try {
-      const info: SentMessageInfo =
-        await this.transporter.sendMail(mailOptions);
-      this.logger.log(
-        `Password reset code sent to ${email}. MessageId: ${info.messageId}`,
-      );
+      await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+      this.logger.log(`Password reset code sent to ${email}`);
     } catch (error) {
       this.logger.error(
         `Failed to send password reset code to ${email}:`,
-        error,
+        error.response?.body || error.message || error,
       );
       throw new Error(
         'Failed to send password reset email. Please try again later.',

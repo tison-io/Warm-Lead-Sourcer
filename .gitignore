@@ -1,8 +1,26 @@
-.env
-.env
+# Environment variables
+backend/.env
+frontend/.env.local
+
+# Development files
 trial.ipynb
 .vscode/
+
+# Python
 __pycache__/
 *.pyc
+
+# System files
 .DS_Store
+
+# Logs
 logs/
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+config.bat

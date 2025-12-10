@@ -6,11 +6,12 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Image from "next/image"
-import { login } from "@/lib/api"
+import { useAuth } from "@/contexts/AuthContext"
 
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { login } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -37,9 +38,8 @@ function LoginForm() {
     setIsLoading(true)
 
     try {
-      await login({ email, password })
-     
-      router.push("/input-url")
+      await login(email, password)
+      router.push("/")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed. Please try again.")
     } finally {

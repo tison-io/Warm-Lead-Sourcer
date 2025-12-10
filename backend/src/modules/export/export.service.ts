@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import * as XLSX from 'xlsx';
+// import * as XLSX from 'xlsx';
 import { Lead } from '../leads/schemas/lead.schema';
 
 interface ExportData {
@@ -21,17 +21,21 @@ interface ExportData {
 @Injectable()
 export class ExportService {
   exportToCSV(leads: Lead[]): string {
-    const data = this.formatLeadsForExport(leads);
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    return XLSX.utils.sheet_to_csv(worksheet);
+    // TODO: Install xlsx package
+    throw new Error('Export feature not available');
+    // const data = this.formatLeadsForExport(leads);
+    // const worksheet = XLSX.utils.json_to_sheet(data);
+    // return XLSX.utils.sheet_to_csv(worksheet);
   }
 
   exportToXLSX(leads: Lead[]): Buffer {
-    const data = this.formatLeadsForExport(leads);
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Leads');
-    return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }) as Buffer;
+    // TODO: Install xlsx package
+    throw new Error('Export feature not available');
+    // const data = this.formatLeadsForExport(leads);
+    // const worksheet = XLSX.utils.json_to_sheet(data);
+    // const workbook = XLSX.utils.book_new();
+    // XLSX.utils.book_append_sheet(workbook, worksheet, 'Leads');
+    // return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }) as Buffer;
   }
 
   private formatLeadsForExport(leads: Lead[]): ExportData[] {

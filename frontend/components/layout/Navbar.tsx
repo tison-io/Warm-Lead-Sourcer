@@ -8,7 +8,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const { theme, setTheme } = useTheme();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -36,9 +36,20 @@ export default function Navbar() {
   };
 
   const getInitials = () => {
-    if (!user) return '';
+    if (!user || !user.firstName || !user.lastName) return '';
     return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
   };
+
+  if (isLoading) {
+    return (
+      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-slate-900/90 border-b border-gray-200/50 dark:border-slate-700/50">
+        <div className="mx-auto max-w-7xl px-6 h-16 flex items-center justify-between">
+          <div className="h-8 w-32 bg-gray-200 dark:bg-slate-700 animate-pulse rounded" />
+          <div className="h-8 w-24 bg-gray-200 dark:bg-slate-700 animate-pulse rounded" />
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <>

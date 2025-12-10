@@ -27,14 +27,20 @@ export class UsersService {
     private emailService: EmailService,
   ) {}
 
+  /**
+   * Register a new user and send email verification code
+   * Note: User is not logged in until email is verified
+   */
   async register(registerUserDto: RegisterUserDto): Promise<LoginResponse> {
     const { firstName, lastName, email, password, confirmPassword } =
       registerUserDto;
 
+    // Validate password match
     if (password !== confirmPassword) {
       throw new BadRequestException('Passwords do not match');
     }
 
+    // Check for existing user
     const existingUser = await this.userModel.findOne({
       email: email.toLowerCase(),
     });
@@ -42,9 +48,11 @@ export class UsersService {
       throw new ConflictException('User with this email already exists');
     }
 
+    // Hash password
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+    // Create new user
     const newUser = new this.userModel({
       firstName,
       lastName,
@@ -53,6 +61,29 @@ export class UsersService {
     });
 
     const savedUser = await newUser.save();
+
+    // Generate 6-digit verification code
+    const verificationCode = Math.floor(
+      100000 + Math.random() * 900000,
+    ).toString();
+    const hashedCode = await bcrypt.hash(verificationCode, 10);
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 1); // 1 hour expiry
+
+    await this.userModel.findByIdAndUpdate(savedUser._id, {
+      emailVerificationToken: hashedCode,
+      emailVerificationExpires: expiresAt,
+    });
+
+    // Send verification email (non-blocking)
+    try {
+      await this.emailService.sendEmailVerification(
+        savedUser.email,
+        verificationCode,
+      );
+    } catch (error) {
+      console.error('Failed to send verification email:', error);
+    }
 
     const payload = { sub: savedUser._id, email: savedUser.email };
     const access_token = await this.jwtService.signAsync(payload, {
@@ -194,18 +225,22 @@ export class UsersService {
     }
   }
 
+  /**
+   * Send password reset code to user's email
+   * Returns generic message to prevent email enumeration attacks
+   */
   async forgotPassword(email: string): Promise<{ message: string }> {
     const user = await this.userModel.findOne({ email: email.toLowerCase() });
     if (!user) {
-      // Don't reveal if email exists
+      // Security: Don't reveal if email exists to prevent enumeration
       return { message: 'If the email exists, a reset link has been sent' };
     }
 
-    // Generate reset token (6 digit code)
+    // Generate 6-digit reset code
     const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
     const hashedToken = await bcrypt.hash(resetToken, 10);
 
-    // Token expires in 1 hour
+    // Set 1 hour expiry
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 1);
 
@@ -214,15 +249,15 @@ export class UsersService {
       resetPasswordExpires: expiresAt,
     });
 
-    // Send email with resetToken (not hashedToken)
+    // Send email with plain code (not hashed)
     try {
       await this.emailService.sendPasswordResetCode(user.email, resetToken);
     } catch (error) {
       // Log error but don't reveal to user for security
       console.error('Failed to send password reset email:', error);
-      // Still return success message to prevent email enumeration
     }
 
+    // Always return success to prevent email enumeration
     return { message: 'If the email exists, a reset link has been sent' };
   }
 
@@ -267,5 +302,57 @@ export class UsersService {
     });
 
     return { message: 'Password has been reset successfully' };
+  }
+
+  /**
+   * Verify user's email with 6-digit code and log them in
+   * Returns JWT tokens for automatic login after verification
+   */
+  async verifyEmail(email: string, code: string): Promise<LoginResponse> {
+    // Find user with valid verification token
+    const user = await this.userModel.findOne({
+      email: email.toLowerCase(),
+      emailVerificationExpires: { $gt: new Date() },
+    });
+
+    if (!user || !user.emailVerificationToken) {
+      throw new BadRequestException('Invalid or expired verification code');
+    }
+
+    // Verify code matches
+    const isValid = await bcrypt.compare(code, user.emailVerificationToken);
+    if (!isValid) {
+      throw new BadRequestException('Invalid verification code');
+    }
+
+    // Mark email as verified and clear verification token
+    await this.userModel.findByIdAndUpdate(user._id, {
+      isEmailVerified: true,
+      emailVerificationToken: null,
+      emailVerificationExpires: null,
+    });
+
+    // Generate JWT tokens for automatic login
+    const payload = { sub: user._id, email: user.email };
+    const access_token = await this.jwtService.signAsync(payload, {
+      expiresIn: '15m',
+    });
+    const refresh_token = await this.jwtService.signAsync(payload, {
+      expiresIn: '7d',
+    });
+
+    await this.userModel.findByIdAndUpdate(user._id, {
+      refreshToken: refresh_token,
+    });
+
+    // Return user without sensitive fields
+    const userObj = user.toObject();
+    const { password: _, refreshToken: __, ...userWithoutPassword } = userObj;
+
+    return {
+      access_token,
+      refresh_token,
+      user: userWithoutPassword,
+    };
   }
 }
