@@ -8,7 +8,7 @@ function AuthSuccessContent() {
   const router = useRouter()
 
   useEffect(() => {
-    router.push("/")
+    router.push("/input-url")
   }, [router])
 
   return (

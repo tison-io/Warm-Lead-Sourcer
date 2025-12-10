@@ -32,7 +32,10 @@ export class LeadsService {
     userId: string,
     filters?: LeadFilterDto,
   ): Promise<Lead[]> {
-    const query = this.buildQuery({ postId, userId }, filters);
+    const query = this.buildQuery(
+      { postId, userId, deletedAt: { $exists: false } },
+      filters,
+    );
     const { sort, limit, skip } = this.buildPaginationOptions(filters);
 
     return this.leadModel.find(query).sort(sort).limit(limit).skip(skip).exec();
@@ -169,7 +172,9 @@ export class LeadsService {
   }
 
   async getStats(postId: string, userId: string): Promise<LeadStats> {
-    const leads = await this.leadModel.find({ postId, userId }).exec();
+    const leads = await this.leadModel
+      .find({ postId, userId, deletedAt: { $exists: false } })
+      .exec();
 
     if (leads.length === 0) {
       return {
@@ -221,7 +226,10 @@ export class LeadsService {
   }
 
   async searchAll(userId: string, filters: LeadFilterDto): Promise<Lead[]> {
-    const query = this.buildQuery({ userId }, filters);
+    const query = this.buildQuery(
+      { userId, deletedAt: { $exists: false } },
+      filters,
+    );
     const { sort, limit, skip } = this.buildPaginationOptions(filters);
 
     return this.leadModel.find(query).sort(sort).limit(limit).skip(skip).exec();

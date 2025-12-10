@@ -1,12 +1,11 @@
 # Environment variables
-.env
-.env.local
 backend/.env
 frontend/.env.local
 
 # Development files
 trial.ipynb
 .vscode/
+.hintrc
 
 # Python
 __pycache__/
@@ -25,3 +24,4 @@ node_modules/
 dist/
 build/
 .next/
+config.bat

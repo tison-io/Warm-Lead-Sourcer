@@ -1,15 +1,19 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+
 import Navbar from "@/components/layout/Navbar"
 
 export default function ExtractPage() {
   const [step, setStep] = useState<"input" | "processing" | "error">("input")
   const [url, setUrl] = useState("")
+  const [currentStepIndex, setCurrentStepIndex] = useState(0)
+  const router = useRouter()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -20,6 +24,7 @@ export default function ExtractPage() {
 
     if (isValidUrl) {
       setStep("processing")
+      setCurrentStepIndex(0)
     } else {
       setStep("error")
     }
@@ -33,6 +38,28 @@ export default function ExtractPage() {
     "Scoring leads",
     "Finalizing results",
   ]
+
+  // Auto-progress through steps and redirect when complete
+  useEffect(() => {
+    if (step === "processing") {
+      const interval = setInterval(() => {
+        setCurrentStepIndex((prev) => {
+          if (prev < steps.length - 1) {
+            return prev + 1
+          } else {
+            clearInterval(interval)
+            // Redirect to results dashboard after final step
+            setTimeout(() => {
+              router.push("/results-dashboard")
+            }, 1000)
+            return prev
+          }
+        })
+      }, 2000) // Progress every 2 seconds
+
+      return () => clearInterval(interval)
+    }
+  }, [step, router, steps.length])
 
   if (step === "input") {
     return (
@@ -86,16 +113,20 @@ export default function ExtractPage() {
               <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-200 -translate-y-1/2" />
               <div
                 className="absolute top-1/2 left-0 h-0.5 bg-purple-500 -translate-y-1/2 transition-all duration-500"
-                style={{ width: "50%" }}
+                style={{ width: `${(currentStepIndex / (steps.length - 1)) * 100}%` }}
               />
 
               {steps.map((stepName, index) => (
                 <div key={index} className="flex flex-col items-center relative z-10">
                   <div
-                    className={`w-4 h-4 rounded-full mb-2 ${index === 3 ? "bg-purple-500" : index < 3 ? "bg-purple-500" : "bg-gray-200"}`}
+                    className={`w-4 h-4 rounded-full mb-2 ${
+                      index <= currentStepIndex ? "bg-purple-500" : "bg-gray-200"
+                    }`}
                   />
                   <span
-                    className={`text-xs text-center max-w-80 ${index === 3 ? "text-purple-500 font-medium" : "text-gray-500"}`}
+                    className={`text-xs text-center max-w-80 ${
+                      index === currentStepIndex ? "text-purple-500 font-medium" : "text-gray-500"
+                    }`}
                   >
                     {stepName}
                   </span>

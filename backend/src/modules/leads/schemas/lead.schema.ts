@@ -82,6 +82,12 @@ export class Lead {
 
   @Prop({ default: false })
   exported: boolean;
+
+  @Prop({ required: false })
+  expiresAt?: Date;
+
+  @Prop({ required: false })
+  deletedAt?: Date;
 }
 
 export const LeadSchema = SchemaFactory.createForClass(Lead);

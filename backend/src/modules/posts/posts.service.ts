@@ -17,12 +17,16 @@ export class PostsService {
     const platform = this.detectPlatform(createPostDto.url);
     const postId = this.extractPostId(createPostDto.url, platform);
 
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 30); // 30 days from now
+
     const post = new this.postModel({
       ...createPostDto,
       platform,
       postId,
       userId,
       status: 'pending',
+      expiresAt,
     });
 
     const savedPost = await post.save();
@@ -38,11 +42,16 @@ export class PostsService {
   }
 
   async findAll(userId: string): Promise<Post[]> {
-    return this.postModel.find({ userId }).sort({ createdAt: -1 }).exec();
+    return this.postModel
+      .find({ userId, deletedAt: { $exists: false } })
+      .sort({ createdAt: -1 })
+      .exec();
   }
 
   async findOne(id: string, userId: string): Promise<Post> {
-    const post = await this.postModel.findOne({ _id: id, userId }).exec();
+    const post = await this.postModel
+      .findOne({ _id: id, userId, deletedAt: { $exists: false } })
+      .exec();
     if (!post) {
       throw new NotFoundException('Post not found');
     }

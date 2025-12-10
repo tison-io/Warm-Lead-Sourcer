@@ -130,6 +130,9 @@ export class ScrapingService {
     const guessedEmail = this.generateEmailGuess(profileData);
 
     // Create lead
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 30); // 30 days from now
+
     const lead = new this.leadModel({
       postId,
       userId,
@@ -144,6 +147,7 @@ export class ScrapingService {
       matchScore,
       guessedEmail,
       tags: [],
+      expiresAt,
     });
 
     await lead.save();
