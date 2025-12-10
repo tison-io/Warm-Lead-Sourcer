@@ -20,7 +20,7 @@ interface ExportData {
 
 @Injectable()
 export class ExportService {
-  exportToCSV(leads: Lead[]): string {
+  exportToCSV(_leads: Lead[]): string {
     // TODO: Install xlsx package
     throw new Error('Export feature not available');
     // const data = this.formatLeadsForExport(leads);
@@ -28,7 +28,7 @@ export class ExportService {
     // return XLSX.utils.sheet_to_csv(worksheet);
   }
 
-  exportToXLSX(leads: Lead[]): Buffer {
+  exportToXLSX(_leads: Lead[]): Buffer {
     // TODO: Install xlsx package
     throw new Error('Export feature not available');
     // const data = this.formatLeadsForExport(leads);

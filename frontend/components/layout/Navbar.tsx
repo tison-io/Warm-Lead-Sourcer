@@ -101,7 +101,7 @@ export default function Navbar() {
               <span>Use Cases</span>
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-purple-800 group-hover:w-full transition-all duration-300"></span>
             </Link>
-            <Link href="#compliance" className="relative text-[15px] font-medium text-slate-700 dark:text-slate-200 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-200 group">
+            <Link href="/privacy-policy" className="relative text-[15px] font-medium text-slate-700 dark:text-slate-200 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-200 group">
               <span>Privacy & Legal</span>
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-purple-800 group-hover:w-full transition-all duration-300"></span>
             </Link>
@@ -217,7 +217,7 @@ export default function Navbar() {
               Use Cases
             </Link>
             <Link
-              href="#compliance"
+              href="/privacy-policy"
               className="text-lg font-medium text-slate-700 dark:text-slate-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >

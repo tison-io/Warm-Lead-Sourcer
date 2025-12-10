@@ -51,7 +51,7 @@ export class CleanupService {
     }
   }
 
-  /** 
+  /**
    * Soft delete users that have expired (expiresAt < now)
    */
   private async softDeleteExpiredUsers(): Promise<void> {
@@ -79,13 +79,11 @@ export class CleanupService {
     );
 
     if (result.modifiedCount > 0) {
-      this.logger.log(
-        `Soft deleted ${result.modifiedCount} expired user(s)`,
-      );
+      this.logger.log(`Soft deleted ${result.modifiedCount} expired user(s)`);
     }
   }
 
-  /** 
+  /**
    * Soft delete leads that have expired
    */
   private async softDeleteExpiredLeads(): Promise<void> {
@@ -110,13 +108,11 @@ export class CleanupService {
     );
 
     if (result.modifiedCount > 0) {
-      this.logger.log(
-        `Soft deleted ${result.modifiedCount} expired lead(s)`,
-      );
+      this.logger.log(`Soft deleted ${result.modifiedCount} expired lead(s)`);
     }
   }
 
-  /** 
+  /**
    * Soft delete posts that have expired
    */
   private async softDeleteExpiredPosts(): Promise<void> {
@@ -138,9 +134,7 @@ export class CleanupService {
     );
 
     if (result.modifiedCount > 0) {
-      this.logger.log(
-        `Soft deleted ${result.modifiedCount} expired post(s)`,
-      );
+      this.logger.log(`Soft deleted ${result.modifiedCount} expired post(s)`);
     }
   }
 

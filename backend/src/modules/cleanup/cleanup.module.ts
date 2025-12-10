@@ -17,4 +17,3 @@ import { Post, PostSchema } from '../posts/schemas/post.schema';
   exports: [CleanupService],
 })
 export class CleanupModule {}
-
