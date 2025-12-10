@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import Sidebar from "@/components/dashboard/Sidebar"
@@ -27,7 +27,7 @@ interface Post {
   totalEngagements?: number
 }
 
-export default function ResultsPage() {
+function ResultsPageContent() {
   const [leads, setLeads] = useState<Lead[]>([])
   const [post, setPost] = useState<Post | null>(null)
   const [loading, setLoading] = useState(true)
@@ -387,5 +387,17 @@ export default function ResultsPage() {
       )}
     </div>
     </ProtectedRoute>
+  )
+}
+
+export default function ResultsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    }>
+      <ResultsPageContent />
+    </Suspense>
   )
 }
