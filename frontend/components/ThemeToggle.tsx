@@ -8,6 +8,8 @@ export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+     // Intentionally set mounted in an effect to avoid server/client hydration mismatch
+  // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
   }, [])
 
