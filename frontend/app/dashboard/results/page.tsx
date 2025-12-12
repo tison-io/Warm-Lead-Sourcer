@@ -76,7 +76,7 @@ function ResultsPageContent() {
     try {
       toast.loading('Preparing export data...', { id: toastId })
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ' https://warm-lead-sourcer-2.onrender.com'}/leads/export?postId=${postId}&format=${format}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://warm-lead-sourcer-2.onrender.com'}/leads/export?postId=${postId}&format=${format}`, {
         credentials: 'include',
       })
       

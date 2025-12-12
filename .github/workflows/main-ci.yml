@@ -59,7 +59,7 @@ jobs:
     - name: Build application
       run: npm run build
       env:
-        NEXT_PUBLIC_API_URL:  https://warm-lead-sourcer-2.onrender.com
+        NEXT_PUBLIC_API_URL: https://warm-lead-sourcer-2.onrender.com
 
   # Backend CI Job
   backend:

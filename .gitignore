@@ -1,6 +1,4 @@
 # Environment variables
-.env
-.env.local
 backend/.env
 frontend/.env.local
 
@@ -26,3 +24,4 @@ node_modules/
 dist/
 build/
 .next/
+config.bat
