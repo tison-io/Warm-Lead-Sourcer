@@ -1,10 +1,12 @@
-from utils.llm_client import calculate_score
+import os
+import sys
 import logging
 import csv
 import asyncio
-import os
-import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from utils.llm_client import calculate_score
 
 logger = logging.getLogger(__name__)
 
@@ -15,17 +17,18 @@ if __name__ == "__main__":
     )
 
 def email_generator(profile_data):
-        try:
-            logger.info("Generating email for profile: %s", profile_data["name"])
-            first_name, last_name = profile_data["name"].lower().split(" ", 1)  # FIX: Handle names with more than 2 parts
-            if " " in last_name:  # If last_name has spaces, take the last word
-                last_name = last_name.split()[-1]
-            university = profile_data["education"].replace(" ", "").lower()
-            logger.info("Email generated successfully.")
-            return f"{first_name}.{last_name}@{university}.edu"
-        except Exception as e:
-            logger.exception("Error generating email: %s", e)
-            return ""
+    try:
+        logger.info("Generating email for profile: %s", profile_data["name"])
+        # FIX: Handle names with more than 2 parts
+        first_name, last_name = profile_data["name"].lower().split(" ", 1)
+        if " " in last_name:  # If last_name has spaces, take the last word
+            last_name = last_name.split()[-1]
+        university = profile_data["education"].replace(" ", "").lower()
+        logger.info("Email generated successfully.")
+        return f"{first_name}.{last_name}@{university}.edu"
+    except Exception as e:
+        logger.exception("Error generating email: %s", e)
+        return ""
         
     
 async def filter_profiles(profiles, keywords: list[str]):
@@ -62,13 +65,13 @@ def lead_presentation(profiles_with_scores):
 async def export(profile_list):
     file_name = "leads.csv"
     try:
-         column_names = ["Name", "LinkedIn URL", "Current Role", "University", "Country", "Email", "Score"]
-         with open(file=file_name, mode="w", newline="", encoding="utf-8") as file:
+        column_names = ["Name", "LinkedIn URL", "Current Role", "University", "Country", "Email", "Score"]
+        with open(file=file_name, mode="w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
             writer.writerow(column_names)
             # Write profile data to csv
             for profile in profile_list:
-                writer.writerow([  # FIX: Removed await - csv.writer is not async
+                writer.writerow([
                     profile.get("name", ""),
                     profile.get("linkedin_url", ""),
                     profile.get("current_role", ""),
@@ -77,11 +80,11 @@ async def export(profile_list):
                     profile.get("email", ""),
                     profile.get("score", "")
                 ])
-         logger.info("CSV file created successfully: %s", file_name)
-         return file_name
+        logger.info("CSV file created successfully: %s", file_name)
+        return file_name
     except Exception as e:
-            logger.exception("Error creating CSV file: %s", e)
-            return None  
+        logger.exception("Error creating CSV file: %s", e)
+        return None  
 
 async def test():
     """Test enrichment service"""

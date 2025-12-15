@@ -5,8 +5,10 @@ import re
 from typing import Dict, List
 import os
 import sys
-from utils.llm_client import LLMClient
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from utils.llm_client import LLMClient
 from models.schemas import ExtractedFields
 
 logger = logging.getLogger(__name__)
@@ -18,19 +20,7 @@ class FieldExtractor:
         logger.info("FieldExtractor initialized")
     
     async def extract_fields(self, profile_text: str) -> ExtractedFields:
-        """Extract fields from LinkedIn profile text using rules + LLM fallback
-        
-        Example:
-            profile = '''
-            John Kamau
-            Data Scientist at Safaricom PLC
-            Nairobi, Kenya
-            Education: University of Nairobi - Computer Science
-            '''
-            result = await extractor.extract_fields(profile)
-            # result.role = "Data Scientist"
-            # result.university = "University of Nairobi"
-        """
+        """Extract fields from LinkedIn profile text using rules + LLM fallback"""
         try:
             text = self._clean(profile_text)
             data = self._extract_with_rules(text)
@@ -124,13 +114,7 @@ class FieldExtractor:
         return data
     
     def _expand_uni(self, uni: str) -> str:
-        """Expand university abbreviations for Kenyan and international universities
-        
-        Examples:
-            "UoN" -> "University of Nairobi"
-            "JKUAT" -> "Jomo Kenyatta University of Agriculture and Technology"
-            "MIT" -> "Massachusetts Institute of Technology"
-        """
+        """Expand university abbreviations for Kenyan and international universities"""
         abbrevs = {
             'UoN': 'University of Nairobi',
             'JKUAT': 'Jomo Kenyatta University of Agriculture and Technology',
@@ -154,7 +138,6 @@ class FieldExtractor:
         return uni
     
     async def _extract_with_llm(self, text: str) -> Dict:
-    
         try:
             prompt = f"""Extract information from this LinkedIn profile. Focus on accuracy.
 
@@ -238,14 +221,14 @@ Rules:
         return validated
     
     async def extract_batch(self, profiles: List[str]) -> List[ExtractedFields]:
-       
         tasks = [self.extract_fields(text) for text in profiles]
         results = await asyncio.gather(*tasks, return_exceptions=True)
         return [r for r in results if isinstance(r, ExtractedFields)]
 
 
 async def enrich_from_linkedin(raw_profile: Dict) -> Dict:
-    from genai_service.core.enrichment_service import email_generator
+    # UPDATED IMPORT: Removed 'genai_service.' prefix
+    from core.enrichment_service import email_generator
     
     try:
         extractor = FieldExtractor()
