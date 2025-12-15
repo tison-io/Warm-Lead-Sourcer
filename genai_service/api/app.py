@@ -1,9 +1,9 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
-from ..models.schemas import GeneralProfile, PostInput
-from ..utils.llm_client import platform_detection
-from ..utils.scrapers import ScraperUtils
-from ..core.main import LeadPipeline  
+from genai_service.models.schemas import GeneralProfile, PostInput
+from genai_service.utils.llm_client import platform_detection
+from genai_service.utils.scrapers import ScraperUtils
+from genai_service.core.main import LeadPipeline  
 import logging
 import csv
 import io
