@@ -1,6 +1,10 @@
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
-from genai_service.models.schemas import LeadScoreOutput
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from models.schemas import LeadScoreOutput
+
 
 parser = JsonOutputParser(pydantic_object=LeadScoreOutput)
 format_instructions = parser.get_format_instructions()
