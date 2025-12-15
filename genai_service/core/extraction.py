@@ -3,6 +3,9 @@ import json
 import logging
 import re
 from typing import Dict, List
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.llm_client import LLMClient
 from models.schemas import ExtractedFields
 

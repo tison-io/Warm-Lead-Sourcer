@@ -2,6 +2,9 @@ from utils.llm_client import calculate_score
 import logging
 import csv
 import asyncio
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 logger = logging.getLogger(__name__)
 

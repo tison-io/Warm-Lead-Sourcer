@@ -8,7 +8,10 @@ import json
 import re
 from typing import Optional
 from groq import Groq
-from ..config.prompts import platform_prompt, score_prompt
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config.prompts import platform_prompt, score_prompt
 
 # import google.generativeai as genai
 

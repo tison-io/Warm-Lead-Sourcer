@@ -1,5 +1,9 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from models.schemas import GeneralProfile, PostInput
 from utils.llm_client import platform_detection
 from utils.scrapers import ScraperUtils
