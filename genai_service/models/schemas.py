@@ -5,7 +5,7 @@ from enum import Enum
 
 class PostInput(BaseModel):
     post_url: str
-    keywords: Optional[list[str]] = None
+    keywords: Optional[list[str]] = "How credible is this lead?"
 class EngagementSource(str, Enum):
     '''type of engagement'''
     reaction = "reaction"

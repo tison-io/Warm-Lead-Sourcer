@@ -13,19 +13,15 @@ platform_prompt = ChatPromptTemplate.from_template(
 score_prompt = ChatPromptTemplate.from_template(
     """You are a lead scoring agent. Your task is to analyze the provided lead information and assign a lead score based on the following criteria: 
     Compare the keywords and filter parameters with the lead information.
-    Assign a score from 1 to 10, where 1 indicates a low-quality lead and 10 indicates a high-quality lead.
+    Assign nly an integer score from 1 to 10, where 1 indicates a low-quality lead and 10 indicates a high-quality lead.
     Consider factors such as relevance to the specified keywords, completeness of information, and alignment with the filter parameters.
     Provide a brief explanation for the assigned score
     Lead information: {lead_information}
     keywords and filters: {keywords}
     
-    Return your response in this format:
-    Score: <number from 1-10>
-    Reasoning: <brief explanation>
-    """
+   Return the result as a single integer score ONLY. for exapmple: 7"""
 )
 
-# Extraction prompt for FieldExtractor
 EXTRACTION_PROMPT = """Extract from this LinkedIn profile:
 
 {profile_text}

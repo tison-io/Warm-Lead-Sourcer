@@ -1,0 +1,20 @@
+# Python files
+__pycache__/
+*.pyc
+*.log
+
+# Git files
+.git/
+.gitignore
+*.vscode/
+
+.env
+trial.ipynb
+db/
+knowledge/
+
+# Ignores python and os files
+__pycache__/
+*.pyc
+*.log
+.DS_Store

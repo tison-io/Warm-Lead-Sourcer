@@ -1,4 +1,3 @@
-from genai_service.config.prompts import platform_prompt, score_prompt
 from langchain_core.output_parsers import StrOutputParser
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
@@ -9,7 +8,9 @@ import json
 import re
 from typing import Optional
 from groq import Groq
-import google.generativeai as genai
+from ..config.prompts import platform_prompt, score_prompt
+
+# import google.generativeai as genai
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -65,39 +66,25 @@ async def platform_detection(link: str) -> str:
 
 async def calculate_score(profile: dict, criteria: list) -> int:
     """Calculate lead score (1-10) using LangChain chain"""
-    try:
-        criteria_str = ", ".join(criteria) if criteria else "general quality"
-        
+    try:        
         score_chain = score_prompt | core_model | StrOutputParser()
         result = await score_chain.ainvoke({
             "lead_information": str(profile),
-            "keywords": criteria_str
+            "keywords": criteria
         })
-        
-        score_match = re.search(r'Score:\s*(\d+)', result, re.IGNORECASE)
-        if not score_match:
-            score_match = re.search(r'\b([1-9]|10)\b', result)
-        
-        if score_match:
-            score = int(score_match.group(1))
-            logger.info(f"Calculated score: {score} for {profile.get('name', 'unknown')}")
-            return min(max(score, 1), 10)  
-        
-        logger.warning(f"Could not extract score from: {result}")
-        return 5  
-        
+        return result.strip()
     except Exception as e:
         logger.exception(f"Error calculating score: {e}")
         return 5
 
 
-class LLMClient:
+# class LLMClient:
     
     def __init__(self):  
         self.provider = os.getenv("LLM_PROVIDER", "groq").lower()
         self.temperature = float(os.getenv("LLM_TEMPERATURE", "0.3"))
         self.max_tokens = int(os.getenv("LLM_MAX_TOKENS", "1000"))
-        self.timeout = int(os.getenv("LLM_TIMEOUT", "15"))
+        # self.timeout = int(os.getenv("LLM_TIMEOUT", "15"))
         
         if self.provider == "groq":
             api_key = os.getenv("GROQ_API_KEY")
@@ -207,8 +194,8 @@ async def test_llm():
     
     # Test 2: LLMClient
     print("Test 2: LLMClient Extraction")
-    client = LLMClient()
-    response = await client.call("Say 'LLMClient is working!'")
+    # client = LLMClient()
+    response = await general_model.invoke("Say 'LLMClient is working!'")
     print(f"✓ Response: {response}\n")
     
     # Test 3: JSON extraction
@@ -225,12 +212,12 @@ Return this format:
   "country": "string"
 }"""
     
-    json_response = await client.call(json_prompt, json_mode=True)
+    json_response = await core_model.invoke(json_prompt, json_mode=True)
     print(f"✓ JSON Response: {json_response}")
     
     try:
-        data = client.parse_json_response(json_response)
-        print(f"✓ Parsed: role={data.get('role')}, university={data.get('university')}\n")
+        # data = client.parse_json_response(json_response)
+        print(f"✓ Parsed: role={json_response.get('role')}, university={json_response.get('university')}\n")
     except Exception as e:
         print(f"✗ JSON parsing failed: {e}\n")
     

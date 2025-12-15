@@ -131,6 +131,13 @@ async def lead_generator(request: Request, post: PostInput):
         raise   
     except Exception as e:
         logger.exception("Error in lead generation process: %s", e)
+    if platform == "linkedin":
+        logger.info("LinkedIn platform detected. Proceeding with LinkedIn lead generation.")
+        return scraper.linkedin_scraper(profile_urls=[post.post_url])
+    elif platform == "unknown":
+        logger.warning("Unknown platform detected. Cannot proceed with lead generation.")
+        return {"message": "The provided link does not belong to a supported platform."}
+    
         raise HTTPException(status_code=500, detail=str(e))
 
 
