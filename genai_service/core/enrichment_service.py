@@ -1,4 +1,4 @@
-from ..utils.llm_client import calculate_score
+from utils.llm_client import calculate_score
 import logging
 import csv
 import asyncio

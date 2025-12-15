@@ -2,11 +2,11 @@ import asyncio
 import logging
 from typing import List, Dict
 
-from genai_service.utils.scrapers import ScraperUtils
-from genai_service.core.extraction import FieldExtractor, enrich_from_linkedin
-from genai_service.core.enrichment_service import filter_profiles, lead_presentation, export
+from utils.scrapers import ScraperUtils
+from core.extraction import FieldExtractor, enrich_from_linkedin
+from core.enrichment_service import filter_profiles, lead_presentation, export
 
-from genai_service.validators.validators import validate_profile_urls, validate_keywords
+from validators.validators import validate_profile_urls, validate_keywords
 
 
 logger = logging.getLogger(__name__)

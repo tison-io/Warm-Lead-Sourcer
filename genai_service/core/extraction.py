@@ -3,8 +3,8 @@ import json
 import logging
 import re
 from typing import Dict, List
-from genai_service.utils.llm_client import LLMClient
-from genai_service.models.schemas import ExtractedFields
+from utils.llm_client import LLMClient
+from models.schemas import ExtractedFields
 
 logger = logging.getLogger(__name__)
 
