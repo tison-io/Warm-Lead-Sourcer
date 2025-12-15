@@ -81,8 +81,8 @@ async def calculate_score(profile: dict, criteria: list) -> int:
         return 5
 
 
- class LLMClient:
-    
+class LLMClient:
+        
     def __init__(self):  
         self.provider = os.getenv("LLM_PROVIDER", "groq").lower()
         self.temperature = float(os.getenv("LLM_TEMPERATURE", "0.3"))
