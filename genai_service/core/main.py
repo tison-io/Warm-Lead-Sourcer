@@ -3,14 +3,13 @@ import logging
 from typing import List, Dict
 import os
 import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.scrapers import ScraperUtils
 from core.extraction import FieldExtractor, enrich_from_linkedin
 from core.enrichment_service import filter_profiles, lead_presentation, export
-
 from validators.validators import validate_profile_urls, validate_keywords
-
 
 logger = logging.getLogger(__name__)
 
