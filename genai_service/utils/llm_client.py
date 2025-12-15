@@ -13,7 +13,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config.prompts import platform_prompt, score_prompt
 
-# import google.generativeai as genai
+import google.generativeai as genai
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -81,13 +81,13 @@ async def calculate_score(profile: dict, criteria: list) -> int:
         return 5
 
 
-# class LLMClient:
+ class LLMClient:
     
     def __init__(self):  
         self.provider = os.getenv("LLM_PROVIDER", "groq").lower()
         self.temperature = float(os.getenv("LLM_TEMPERATURE", "0.3"))
         self.max_tokens = int(os.getenv("LLM_MAX_TOKENS", "1000"))
-        # self.timeout = int(os.getenv("LLM_TIMEOUT", "15"))
+        self.timeout = int(os.getenv("LLM_TIMEOUT", "15"))
         
         if self.provider == "groq":
             api_key = os.getenv("GROQ_API_KEY")
