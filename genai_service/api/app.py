@@ -1,13 +1,12 @@
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-import os
-import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from models.schemas import GeneralProfile, PostInput
-from utils.llm_client import platform_detection
+from utils.llm_client import platform_detection, calculate_score
 from utils.scrapers import ScraperUtils
 from core.main import LeadPipeline  
+from core.extraction import FieldExtractor
+from core.enrichment_service import email_generator
 import logging
 import csv
 import io
@@ -26,9 +25,17 @@ logging.basicConfig(
 
 logger.info("Starting GenAI Service API")
 app = FastAPI(
-    title="Warm Lead Sourcer", 
-    description="API for Generative AI based lead enrichment and scoring service", 
+    title="Warm Lead Sourcer - GenAI Service", 
+    description="AI-powered profile enrichment and lead scoring service", 
     version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # will update later
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.state.limiter = limiter
@@ -50,41 +57,257 @@ except Exception as e:
     pipeline = None
 
 
-async def main_pipeline(post_url, filters: list[str]):
-    try:
-        platform = await platform_detection(link=post_url)
-        logger.info("Platform detected: %s", platform)
-        logger.info("Identified platform. Proceeding with lead generation.")
-    except Exception as e:
-        logger.exception("Error in lead generation process: %s", e)
-        return {"message": "Failed to detect platform", "error": str(e)}
-    
-    if platform == "linkedin":
-        logger.info("LinkedIn platform detected. Proceeding with LinkedIn lead generation.")
-        return scraper.linkedin_scraper(link=post_url)
-    elif platform == "instagram":
-        logger.info("Instagram platform detected. Proceeding with Instagram lead generation.")
-        return scraper.instagram_scraper(link=post_url)
-    elif platform == "x":
-        logger.info("X platform detected. Proceeding with X lead generation.")
-        return scraper.x_scraper(link=post_url)
-    elif platform == "facebook":
-        logger.info("Facebook platform detected. Proceeding with Facebook lead generation.")
-        return scraper.facebook_scraper(link=post_url)
-    elif platform == "unknown":
-        logger.warning("Unknown platform detected. Cannot proceed with lead generation.")
-        return {"message": "The provided link does not belong to a supported platform."}
-
-
 @app.get("/")
 async def health_check():
+    """Health check endpoint"""
     logger.info("Health check endpoint called")
-    return {"message": "GenAI Service is up and running!"}
+    return {
+        "status": "healthy",
+        "message": "GenAI Service is up and running!",
+        "version": "1.0.0",
+        "endpoints": {
+            "enrich_single": "/api/enrich",
+            "enrich_batch": "/api/enrich/batch",
+            "score_lead": "/api/score",
+            "docs": "/docs"
+        }
+    }
 
+
+
+@app.post("/api/enrich")
+@limiter.limit("20/minute")
+async def enrich_single_profile(request: Request, data: dict):
+    """
+    Enrich a single LinkedIn profile with AI-powered extraction.
+    
+    This endpoint is called by the web dev's backend to enrich scraped profiles.
+    
+    Request body:
+    {
+        "profile_text": "John Doe, Software Engineer at Google. Stanford University. San Francisco, USA.",
+        "name": "John Doe",
+        "platform": "linkedin"
+    }
+    
+    Response:
+    {
+        "name": "John Doe",
+        "role": "Software Engineer",
+        "university": "Stanford University",
+        "country": "USA",
+        "city": "San Francisco",
+        "email": "john.doe@stanford.edu",
+        "score": 0
+    }
+    """
+    try:
+        profile_text = data.get("profile_text", "")
+        name = data.get("name", "")
+        platform = data.get("platform", "linkedin")
+        
+        if not profile_text:
+            raise HTTPException(status_code=400, detail="profile_text is required")
+        
+        logger.info(f"Enriching profile for: {name}")
+        
+        # Extract fields using GenAI
+        extractor = FieldExtractor()
+        extracted = await extractor.extract_fields(profile_text)
+        
+        # Build enriched response
+        enriched = {
+            "name": name,
+            "role": extracted.role or "",
+            "university": extracted.university or "",
+            "country": extracted.country or "",
+            "city": extracted.raw_location.split(',')[0].strip() if extracted.raw_location else "",
+            "email": "",
+            "score": 0
+        }
+        
+        # Generate email pattern
+        if name and enriched["university"]:
+            try:
+                enriched["email"] = email_generator({
+                    "name": name,
+                    "education": enriched["university"]
+                })
+            except Exception as e:
+                logger.error(f"Email generation failed: {e}")
+                enriched["email"] = ""
+        
+        logger.info(f"✓ Successfully enriched profile: {name}")
+        return enriched
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception(f"Enrichment error: {e}")
+        raise HTTPException(status_code=500, detail=f"Enrichment failed: {str(e)}")
+
+
+@app.post("/api/enrich/batch")
+@limiter.limit("10/minute")
+async def enrich_batch_profiles(request: Request, data: dict):
+    """
+    Enrich multiple profiles at once (max 50 profiles per request).
+    
+    Request body:
+    {
+        "profiles": [
+            {
+                "profile_text": "John Doe, Engineer at Google...",
+                "name": "John Doe",
+                "platform": "linkedin"
+            },
+            {
+                "profile_text": "Jane Smith, Manager at Microsoft...",
+                "name": "Jane Smith",
+                "platform": "linkedin"
+            }
+        ]
+    }
+    
+    Response:
+    {
+        "enriched": [
+            { "name": "John Doe", "role": "Software Engineer", ... },
+            { "name": "Jane Smith", "role": "Product Manager", ... }
+        ],
+        "total": 2,
+        "successful": 2,
+        "failed": 0
+    }
+    """
+    try:
+        profiles = data.get("profiles", [])
+        
+        if not profiles:
+            raise HTTPException(status_code=400, detail="profiles array is required")
+        
+        if len(profiles) > 50:
+            raise HTTPException(status_code=400, detail="Maximum 50 profiles per batch")
+        
+        logger.info(f"Batch enriching {len(profiles)} profiles")
+        
+        extractor = FieldExtractor()
+        enriched_profiles = []
+        failed_count = 0
+        
+        for profile in profiles:
+            try:
+                profile_text = profile.get("profile_text", "")
+                name = profile.get("name", "")
+                
+                # Extract
+                extracted = await extractor.extract_fields(profile_text)
+                
+                enriched = {
+                    "name": name,
+                    "role": extracted.role or "",
+                    "university": extracted.university or "",
+                    "country": extracted.country or "",
+                    "city": extracted.raw_location.split(',')[0].strip() if extracted.raw_location else "",
+                    "email": "",
+                    "score": 0
+                }
+                
+                # Generate email
+                if name and enriched["university"]:
+                    try:
+                        enriched["email"] = email_generator({
+                            "name": name,
+                            "education": enriched["university"]
+                        })
+                    except:
+                        pass
+                
+                enriched_profiles.append(enriched)
+                
+            except Exception as e:
+                logger.error(f"Failed to enrich {profile.get('name', 'unknown')}: {e}")
+                failed_count += 1
+                # Add empty profile to maintain order
+                enriched_profiles.append({
+                    "name": profile.get("name", ""),
+                    "role": "",
+                    "university": "",
+                    "country": "",
+                    "city": "",
+                    "email": "",
+                    "score": 0
+                })
+        
+        logger.info(f"✓ Batch complete: {len(enriched_profiles) - failed_count}/{len(profiles)} successful")
+        
+        return {
+            "enriched": enriched_profiles,
+            "total": len(profiles),
+            "successful": len(enriched_profiles) - failed_count,
+            "failed": failed_count
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception(f"Batch enrichment error: {e}")
+        raise HTTPException(status_code=500, detail=f"Batch enrichment failed: {str(e)}")
+
+
+@app.post("/api/score")
+@limiter.limit("30/minute")
+async def score_lead(request: Request, data: dict):
+    """
+    Score a lead from 1-10 based on keywords/criteria.
+    
+    Request body:
+    {
+        "profile": {
+            "name": "John Doe",
+            "role": "Software Engineer",
+            "university": "MIT",
+            "country": "USA"
+        },
+        "keywords": ["engineer", "mit", "software"]
+    }
+    
+    Response:
+    {
+        "score": 8
+    }
+    """
+    try:
+        profile = data.get("profile", {})
+        keywords = data.get("keywords", [])
+        
+        if not profile:
+            raise HTTPException(status_code=400, detail="profile is required")
+        
+        logger.info(f"Scoring profile: {profile.get('name', 'unknown')}")
+        
+        score = await calculate_score(profile, keywords)
+        
+        logger.info(f"✓ Score calculated: {score}/10")
+        
+        return {"score": score}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception(f"Scoring error: {e}")
+        raise HTTPException(status_code=500, detail=f"Scoring failed: {str(e)}")
+
+
+# ========== ORIGINAL ENDPOINTS (Keep for standalone testing) ==========
 
 @app.post("/leads")
 @limiter.limit("10/minute")
 async def lead_generator(request: Request, post: PostInput):
+    """
+    Original full pipeline endpoint - processes complete LinkedIn posts.
+    This is for testing your service independently.
+    """
     logger.info("Starting the lead generation process")
     
     try:
@@ -113,19 +336,19 @@ async def lead_generator(request: Request, post: PostInput):
             }
         
         elif platform == "instagram":
-            logger.info("Instagram platform detected. Proceeding with Instagram lead generation.")
-            return scraper.instagram_scraper(link=post.post_url)
+            logger.info("Instagram platform detected.")
+            return {"success": False, "message": "Instagram scraper not yet implemented"}
         
         elif platform == "x":
-            logger.info("X platform detected. Proceeding with X lead generation.")
-            return scraper.x_scraper(link=post.post_url)
+            logger.info("X platform detected.")
+            return {"success": False, "message": "X scraper not yet implemented"}
         
         elif platform == "facebook":
-            logger.info("Facebook platform detected. Proceeding with Facebook lead generation.")
-            return scraper.facebook_scraper(link=post.post_url)
+            logger.info("Facebook platform detected.")
+            return {"success": False, "message": "Facebook scraper not yet implemented"}
         
-        elif platform == "unknown":
-            logger.warning("Unknown platform detected. Cannot proceed with lead generation.")
+        else:
+            logger.warning("Unknown platform detected.")
             return {
                 "success": False,
                 "message": "The provided link does not belong to a supported platform."
@@ -135,18 +358,12 @@ async def lead_generator(request: Request, post: PostInput):
         raise   
     except Exception as e:
         logger.exception("Error in lead generation process: %s", e)
-    if platform == "linkedin":
-        logger.info("LinkedIn platform detected. Proceeding with LinkedIn lead generation.")
-        return scraper.linkedin_scraper(profile_urls=[post.post_url])
-    elif platform == "unknown":
-        logger.warning("Unknown platform detected. Cannot proceed with lead generation.")
-        return {"message": "The provided link does not belong to a supported platform."}
-    
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/export/csv")
 async def export_leads(profiles: list[GeneralProfile]):
+    """CSV export endpoint"""
     logger.info(f"Export requested for {len(profiles)} profiles")
     
     if not profiles:
