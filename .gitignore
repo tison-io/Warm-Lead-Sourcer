@@ -1,6 +1,4 @@
 # Environment variables
-.env
-.env.local
 backend/.env
 frontend/.env.local
 
@@ -30,3 +28,4 @@ build/
 __pycache__/
 *.pyc
 *.pyo
+config.bat

@@ -13,29 +13,19 @@ logging.basicConfig(
 
 load_dotenv()
 
-def get_user_parameters() -> SerperSearchResult: 
-    try:
-        logger.info("Prompting user for Serper search parameters.")
-        parameters = {
-            "country": "ke",
-            "keywords":  input("Keywords: "),
-            "pages": int(input("Number of pages to retrieve: "))
-        }
-        logger.info("User provided Serper search parameters: %s", parameters)
-
-        return SerperSearchResult(
-            keywords=parameters["keywords"],
-            country=parameters["country"],
-            pages=parameters["pages"]
-        )
-    except Exception as e:
-        logger.error("Error obtaining user parameters: %s", e)
-        logger.info("Using default Serper search parameters.")
-        return SerperSearchResult(
-            keywords="latest technology trends",
-            country="us",
-            pages=1
-        )
+def get_user_parameters(
+    keywords: str | None = None,
+    country: str = "us",
+    pages: int = 1
+) -> SerperSearchResult:
+    """
+    Get search parameters. Falls back to defaults if not provided.
+    """
+    return SerperSearchResult(
+        keywords=keywords or "latest technology trends",
+        country=country,
+        pages=pages
+    )
 
 def serper_search():
     params = get_user_parameters()
@@ -66,21 +56,15 @@ def serper_search():
         raise Exception(f"Failed to build combined payload query: {e}")
 
     try:
-        logger.info("Connecting to google.serper.dev for search.")
+        logger.info("Creating connection object for google.serper.dev.")
         google = http.client.HTTPSConnection("google.serper.dev")
         logger.info("Connected to google.serper.dev successfully.")
     except Exception as e:
-        logger.error("Error connecting to google.serper.dev: %s", e)
+        logger.error("Error creating connection object: %s", e)
         raise  Exception(f"Failed to connect to Serper API: {e}") 
     
     try:
         logger.info("Preparing Serper search payload.")
-        # payload = json.dumps({
-        #     # "q" : params.keywords,
-        #     "q": professional_query,
-        #     "gl" : params.country,
-        #     "page": params.pages
-        # })
         payload = json.dumps(queries)
         logger.info("Serper search payload prepared: %s", payload)
     except Exception as e:
@@ -105,12 +89,18 @@ def serper_search():
         }
         google.request("POST", "/search", payload, headers)
         res = google.getresponse()
-        data = res.read()
+        raw_data = res.read().decode("utf-8")
+        if res.status >= 400:
+            logger.error("Serper API error %d: %s", res.status, raw_data)
+            raise Exception(f"Serper API returned {res.status}: {raw_data}")
+
         logger.info("Serper search request executed successfully.")
-        return data.decode("utf-8")
+        return raw_data
     except Exception as e:
         logger.error("Error executing Serper search request: %s", e)
         raise Exception(f"Failed to execute Serper search request: {e}")
+    finally:
+        google.close()
 
 
 if __name__ == "__main__":
