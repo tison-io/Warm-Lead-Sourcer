@@ -21,7 +21,7 @@ async def serper_search(keywords: str = "latest technology trends", country: str
         logger.info("Building LinkedIn-specific query for Serper search.")
         keyword_list = params.keywords.split()
         formatted_keywords = " AND ".join([f'"{k}"' for k in keyword_list])
-        return f'site:linkedin.com/in/ {formatted_keywords} {params.country}'
+        return f'site:linkedin.com/in/ {formatted_keywords} '
     try:
         logger.info("Building combined payload query.")
         query = {

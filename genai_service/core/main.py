@@ -1,6 +1,7 @@
 from .extraction import MainPipeline
 from ..models.schemas import GeneralProfile, UserInput
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import logging
 from typing import List, Dict
 
@@ -14,6 +15,14 @@ try:
 except Exception as e:
     logger.error(f"Failed to initialize FastAPI application: {e}")
     raise
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins = ["*"],
+    allow_credentials = True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 

@@ -1,8 +1,5 @@
 from typing import Optional, List
-from pydantic import BaseModel, Field, validator, field_validator
-from datetime import datetime
-from enum import Enum
-
+from pydantic import BaseModel
 
 class GeneralProfile(BaseModel):
     """General profile structure for existing code"""
