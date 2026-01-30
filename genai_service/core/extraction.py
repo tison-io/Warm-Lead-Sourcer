@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Optional
 from ..utils.llm_client import platform_detection
 from ..utils.serper import serper_search
@@ -6,6 +7,9 @@ from ..utils.data_wrangling import data_pipeline
 
 logger = logging.getLogger(__name__)
 
+def link_validation(link: str) -> bool:
+    pattern = r"^https?://([a-z]{2,3}\.)?linkedin\.com/"
+    return bool(re.match(pattern, link, re.IGNORECASE))
 
     
 class MainPipeline():
@@ -13,6 +17,13 @@ class MainPipeline():
         logger.info("Running main pipeline")
 
         if link:
+           
+            logger.info(f"Validating the provided link: {link}")
+            valid = link_validation(link)
+            if not valid:
+                logger.error("Invalid LinkedIn link provided.")
+                raise ValueError("The provided link is not a valid LinkedIn URL.")
+                
             logger.info(f"Link provided. Platform detection will be based on the link.")
             try:
                 platform = await platform_detection(link=link)
