@@ -210,7 +210,7 @@ export default function LandingPage() {
                 <Link href="/signup" className="w-full sm:w-auto max-w-xs">
                   <Button className="group relative rounded-full bg-linear-to-r from-purple-500 to-purple-700 px-6 sm:px-8 py-3 text-sm sm:text-base font-semibold text-white hover:from-purple-600 hover:to-purple-800 shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105 w-full">
                     <span className="flex items-center gap-2 justify-center">
-                      Start Free
+                      Start free
                       <svg className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                       </svg>
