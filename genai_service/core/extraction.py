@@ -8,7 +8,7 @@ from ..utils.data_wrangling import data_pipeline
 logger = logging.getLogger(__name__)
 
 def link_validation(link: str) -> bool:
-    pattern = r"^https?://([a-z]{2,3}\.)?linkedin\.com/"
+    pattern = r"^https?://([a-z0-9-]+\.)?linkedin\.com/"
     return bool(re.match(pattern, link, re.IGNORECASE))
 
     
@@ -18,7 +18,7 @@ class MainPipeline():
 
         if link:
            
-            logger.info(f"Validating the provided link: {link}")
+            logger.info("Validating the provided LinkedIn link")
             valid = link_validation(link)
             if not valid:
                 logger.error("Invalid LinkedIn link provided.")
