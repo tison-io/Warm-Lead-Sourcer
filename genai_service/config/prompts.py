@@ -22,29 +22,36 @@ score_prompt = ChatPromptTemplate.from_template(
 role_extraction_prompt = ChatPromptTemplate.from_template("""
 You are a highly precise Data Extraction Assistant. Your task is to process a list of LinkedIn search results and extract structured, clean profile data.
 
-
 1. **Name Normalization**: Remove prefixes (Dr., Eng.) or suffixes (| LinkedIn, - Kenya).
 2. **Current Role Reconstruction**: Many roles are truncated (ending in "..."). Use the "Snippet" field to find the full job title or current employer.
-3. **Role vs. Education**: If the snippet describes a student or recent graduate, the role should reflect that (e.g., "Mechanical Engineering Student").
-4. **Clean Output**: Return only valid JSON.
+3. **Location & Country**: Look for city/country names in the snippet (e.g. "Nairobi" -> Country: "Kenya").
+4. **Education**: Look for university names or abbreviations (e.g. "JKUAT", "UoN", "Moi University").
+5. **Clean Output**: Return only valid JSON.
 
 ### INPUT DATA
 {profile_snippet}
 
 ### JSON FORMAT
 Return a JSON array of objects with these keys:
-- "name": Normal full name that existed earlier
-- "raw_name": Full name without extra tags.
+- "name": Normal full name without extra tags.
+- "raw_name": Full name exactly as it appears.
 - "current_role": Clean, non-truncated professional title.
+- "company": Extract the company name if available (e.g. "Safaricom"). Return null if not found.
+- "education": Extract the university or school name. Return null if not found.
+- "country": Infer the country based on the location (e.g. "Kenya"). Return null if not found.
+- "linkedin_url": The provided LinkedIn URL.
 
 YOU ARE ONLY REQUIRED TO RETURN JSON OUTPUT IN THE FOLLOWING FORMAT:
 [
 {{
-    "name": "Full Name without extra tags",
-    "raw_name": "Full Name inclusives of tags and titles",
-    "current_role": "Clean, non-truncated professional title. Company name if possible but separated from role using '|'. If the person is a student or recent graduate, indicate the institution in the role.",
-    "linkedin_url": "Full LinkedIn URL"
-}},
+    "name": "Full Name Cleaned",
+    "raw_name": "Full Name Raw",
+    "current_role": "Software Engineer",
+    "company": "Company Name",
+    "education": "University Name",
+    "country": "Kenya",
+    "linkedin_url": "https://www.linkedin.com/in/..."
+}}
 ] 
 ENSURE THE OUTPUT IS VALID JSON.
 DO NOT RETURN ANYTHING ELSE OTHER THAN THE JSON OUTPUT.""")
