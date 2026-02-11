@@ -2,6 +2,7 @@ from ..utils.llm_client import calculate_score
 import logging
 import re
 import csv
+import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -130,10 +131,18 @@ async def filter_profiles(profiles, keywords: list[str]):
         logger.info("Starting profile filtering process.")
         for profile in profiles:
             snippet_text = profile.get('summary_profile', '') or f"{profile.get('current_role', '')} {profile.get('about', '')}"
-            
+            llm_input = (
+                f"Candidate: {profile.get('name')}\n"
+                f"Headline: {profile.get('title')}\n"
+                f"Current Role: {profile.get('current_role')}\n"
+                f"education: {profile.get('education')} ({profile.get('degree')})\n"
+                f"location: {profile.get('city')}, {profile.get('country')}\n"
+                f"Education: {profile.get('education')} ({profile.get('degree')})\n"
+                f"Summary: {profile.get('summary_profile')}"
+            )
             raw_score = await calculate_score(
-                profile=profile, 
-                criteria=f" Keywords: {keywords}. Snippet: {snippet_text}"
+                profile=llm_input, 
+                criteria=f" Keywords: {keywords}"
             )
             
             score_match = re.search(r'\b([1-9]|10)\b', str(raw_score))
@@ -149,6 +158,7 @@ async def filter_profiles(profiles, keywords: list[str]):
             if calculated_score >= threshold:
                 filtered_profiles.append(profile)
         logger.info("Profile filtering completed successfully.")
+        await asyncio.sleep(0.6)
     except Exception as e:
         logger.exception("Error during profile filtering: %s", e)
         return filtered_profiles

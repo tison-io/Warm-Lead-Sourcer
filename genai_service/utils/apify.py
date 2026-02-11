@@ -86,21 +86,20 @@ def apify_lead_presentation(profiles: List[Dict]) -> List[Dict]:
             company = experience[0].get("companyName", "Company unavailable")
             current_job = f'{position} | {company}'
         location = profile.get("location", {}).get("parsed", {})
-        education_data = [
-            {
-                "school": edu.get("schoolName"),
-                "degree": edu.get("degree")
-            }
-            for edu in profile.get("education", [])
-            if edu.get("degree")
-        ]
+        edu_entries = [e for e in profile.get("education", []) if e.get("degree")]
+        primary_school = "School unavailable"
+        primary_degree = "Degree unavailable"
+        if edu_entries:
+            primary_school = edu_entries[0].get("schoolName", "School unavailable")
+            primary_degree = edu_entries[0].get("degree", "Degree unavailable")
         lead = {
             "name": f"{profile.get('firstName', 'LinkedIn')} {profile.get('lastName', 'User')}".strip(),
             "title": profile.get("position", "Title unavailable"),
             "current_role": current_job,
             "country": location.get("country", "Country unavailable"),
             "city": location.get("city", "City unavailable"),
-            "education": education_data,
+            "education": primary_school,
+            "degree": primary_degree,
             "linkedin_url": profile.get("linkedinUrl", "LinkedIn URL unavailable"),
             "summary_profile": profile.get("about", "")[:200] if profile.get("about") else "No summary available", 
         }
