@@ -54,7 +54,7 @@ jobs:
       run: npm run lint
     
     - name: Run type checking
-      run: npx tsc --noEmit -p tsconfig.build.json
+      run: npx tsc --noEmit -p tsconfig.json
     
     - name: Build application
       run: npm run build
@@ -88,7 +88,7 @@ jobs:
       run: npm run lint || echo "⚠️ ESLint issues found - please fix when possible"
     
     - name: Run type checking
-      run: npx tsc --noEmit
+      run: npx tsc --noEmit -p tsconfig.build.json
     
     - name: Run tests (non-blocking)
       run: npm run test || echo "Test issues found - continuing build"
