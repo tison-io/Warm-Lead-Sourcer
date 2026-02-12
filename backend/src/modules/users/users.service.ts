@@ -58,7 +58,7 @@ export class UsersService {
     // Create new user
     const newUser = new this.userModel({
       firstName,
-      lastName,
+      lastName: lastName || '',
       email: email.toLowerCase(),
       password: hashedPassword,
       expiresAt,
@@ -168,7 +168,7 @@ export class UsersService {
   async loginOrRegisterWithGoogle(
     email: string,
     firstName: string,
-    lastName: string,
+    lastName?: string,
   ): Promise<LoginResponse> {
     const normalizedEmail = email.toLowerCase();
 
@@ -182,7 +182,7 @@ export class UsersService {
 
       user = new this.userModel({
         firstName,
-        lastName,
+        lastName: lastName || '',
         email: normalizedEmail,
         password: '', // Google OAuth users don't need a password
         expiresAt,
@@ -192,7 +192,7 @@ export class UsersService {
     } else {
       // Update user info in case it changed in Google
       user.firstName = firstName;
-      user.lastName = lastName;
+      user.lastName = lastName || '';
       user.provider = 'google';
       await user.save();
     }

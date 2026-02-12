@@ -17,7 +17,7 @@ interface AuthenticatedRequest extends Request {
   user: {
     email: string;
     firstName: string;
-    lastName: string;
+    lastName?: string;
     picture?: string;
   };
 }
@@ -58,7 +58,7 @@ export class AuthController {
       const result = await this.usersService.loginOrRegisterWithGoogle(
         req.user.email,
         req.user.firstName,
-        req.user.lastName,
+        req.user.lastName || '',
       );
 
       // Set JWT cookies
