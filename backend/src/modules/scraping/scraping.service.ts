@@ -215,6 +215,11 @@ export class ScrapingService {
     }
 
     const enrichUrl = `${baseUrl.replace(/\/$/, '')}/api/enrich`;
+    const timeoutMs =
+      this.configService.get<number>('GENAI_ENRICH_TIMEOUT_MS') ?? 300000;
+    this.logger.log(
+      `Calling Enrich API for post ${postId} (${links.length} links, timeout ${timeoutMs / 1000}s)`,
+    );
     try {
       const response = await axios.post<{
         count?: number;
@@ -231,7 +236,7 @@ export class ScrapingService {
         enrichUrl,
         { links },
         {
-          timeout: 60000,
+          timeout: timeoutMs,
           headers: { 'Content-Type': 'application/json' },
         },
       );
