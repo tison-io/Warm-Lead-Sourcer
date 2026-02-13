@@ -192,7 +192,7 @@ export class UsersService {
     } else {
       // Update user info in case it changed in Google
       user.firstName = firstName || user.firstName;
-      user.lastName = typeof lastName === 'string' ? lastName : '';
+      user.lastName = typeof lastName === 'string' ? lastName : user.lastName;
       user.provider = 'google';
       await user.save();
     }
