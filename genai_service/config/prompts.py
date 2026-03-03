@@ -7,16 +7,33 @@ platform_prompt = ChatPromptTemplate.from_template(
 )
 
 score_prompt = ChatPromptTemplate.from_template(
-    """You are a lead scoring agent. Your task is to analyze the provided lead information and assign a lead score based on the following criteria: 
-    Compare the keywords and filter parameters with the lead information.
-    Assign only an integer score from 1 to 10, where 1 indicates a low-quality lead and 10 indicates a high-quality lead.
-    Consider factors such as relevance to the specified keywords, timeliness, completeness of information, and alignment with the filter parameters.
-    Ensure you deeply and thoroughly analyze the provided raw data against the requirements and give a very accurate score.
-    Lead information: {lead_information}
-    keywords and filters(Can also include a brief summary of the lead generated): {keywords}
-    You are to be very critical and strict in your scoring. Really analyze the lead as per technology human resource sourcing standards. Select a very thorough score that reflects the lead quality. Not all leads should get high scores. Be very thorough and analyze the best of the best.
+    """You are a professional recruiter evaluating candidates for a specific role. Your task is to assess a candidate's profile against a set of criteria and assign a score from 1 to 10.
+    LEAD INFORMATION: {lead_information}
+    TARGET CRITERIA: {keywords}
+    SCORING RUBRIC (1-10):
+    10: Perfect match - All criteria met, senior level, relevant experience clearly demonstrated.
+    8-9: Excellent match - Most criteria met, strong relevant background, minor gaps acceptable
+    6-7: Good match - Core criteria met, decent fit, some missing elements but overall promising
+    4-5: Fair match - Partial criteria met, weak signals, significant gaps in experience or relevance
+    2-3: Poor match - Few criteria met, barely relevant experience, major gaps in qualifications and major misalignment
+    1: No match - None of the criteria met, irrelevant experience, no demonstrated skills or qualifications.
 
-   Return the result as a single integer score ONLY. For example: 7"""
+    EVALUATION FACTORS:
+    1. Keyword relevance: How many target keywords appear in their current role, education or background?
+    2. Experience level: Does their role indicate appropiate seniority for the position?
+    3. Recency: Is their current role active and recent (not outdated)?
+    4. Education quality: Does their university or degree align with requirements?
+    5. Profile completeness: Is enough information available to make a confident assessment?
+    6. Overall fit: Based on the above factors, how well does this candidate match the ideal profile for the role?
+    SCORING GUIDELINES:
+    - Be strict: Average candidates should score 4-6 not 7-8.
+    - Reserve 9-10 for truly exceptional candidates who meet nearly all criteria with strong evidence.
+    - Consider both explicit matches (keywords in role title) and implicit signals (reputable company, relevant education) when scoring.
+    - If critical information is missing (e.g. no current role or education), be conservative in scoring and consider the impact of this lack of data on your confidence in the assessment.
+    -Partial keyword matches are worth less than exact matches
+    
+    Return ONLY a single integer from 1 to 10 . No explanation.
+    Score:"""
 )
 
 role_extraction_prompt = ChatPromptTemplate.from_template("""
@@ -56,4 +73,5 @@ YOU ARE ONLY REQUIRED TO RETURN JSON OUTPUT IN THE FOLLOWING FORMAT:
 }}
 ] 
 ENSURE THE OUTPUT IS VALID JSON.
-DO NOT RETURN ANYTHING ELSE OTHER THAN THE JSON OUTPUT.""")
+DO NOT RETURN ANYTHING ELSE OTHER THAN THE JSON OUTPUT."""
+)
