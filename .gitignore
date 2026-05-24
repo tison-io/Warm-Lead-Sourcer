@@ -1,6 +1,4 @@
 # Environment variables
-.env
-.env.local
 backend/.env
 frontend/.env.local
 
@@ -31,3 +29,4 @@ __pycache__/
 *.pyo
 temp_auto_push.bat
 temp_interactive_push.bat
+config.bat
