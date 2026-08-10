@@ -4,7 +4,6 @@ frontend/.env.local
 
 # Development files
 trial.ipynb
-.vscode/
 .hintrc
 
 # Python
